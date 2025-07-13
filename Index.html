@@ -96,7 +96,7 @@
         }
         .vhf-interference-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; /* Z-index più basso */
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0gAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMiAxNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vL3d3My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZfpc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmadobe.com/xap/1.0/mm/" xmlns:stRef="http://ns.adobe.com/xap/1.0/sT ype/ResourceRef#" xmpMM:DocumentID="xmp.did:EB0E8F671462511E58988FB1B7672F2D" stRef:InstanceID="xmp.iid:EB0E8F671462511E58988FB1B7672F2D"> </rdf:Description> < /rdf:RDF> < /x:xmpmeta> <?xpacket end="w"?>B7L1mAAAAGklEQVR42mJgYGDg/w/AAgAAAP//AgAEAAACDQAAVz7N+AAAAABJRU5ErkJggg==');
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0gAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMiAxNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vL3wzLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkVCMEU4RjY3MTQ2MjUxMUU1ODk4OEZCMUI3NjcyRjJEIiBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkVCMEU4RjY3MTQ2MjUxMUU1ODk4OEZCMUI3NjcyRjJEIj4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InciPz5CN0wxbAAAAGklEQVR42mJgYGDg/w/AAgAAAP//AgAEAAACDQAAVz7N+AAAAABJRU5ErkJggg==');
             background-repeat: repeat;
             animation: static-flicker 0.15s infinite alternate;
             opacity: 0.15;
@@ -144,13 +144,6 @@
             z-index: 20; /* Z-index più basso */
         }
 
-        /* Font personalizzati e stile del bottone con Tailwind */
-        .font-ibm { font-family: 'IBM Plex Mono', monospace; }
-        .font-fira { font-family: 'Share Tech Mono', monospace; }
-        .btn {
-            @apply px-4 py-3 text-sm font-medium text-white transition bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px];
-        }
-
         /* Stili per il modal della musica */
         .modal-overlay {
             position: fixed;
@@ -176,17 +169,6 @@
             overflow: auto;
             position: relative;
             border: 1px solid #00ffcc;
-        }
-
-        .modal-close-btn {
-            @apply absolute top-2 right-2 p-2 text-white bg-red-600 rounded-full hover:bg-red-700;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1rem;
-            line-height: 1;
         }
     </style>
 </head>
@@ -244,10 +226,10 @@
     <!-- Modal per il player musicale -->
     <div id="music-modal-overlay" class="modal-overlay hidden">
         <div class="modal-content w-full md:w-3/4 lg:w-1/2 xl:w-2/5">
-            <button id="music-modal-close-btn" class="modal-close-btn">✖</button>
+            <button id="music-modal-close-btn" class="absolute top-2 right-2 p-2 text-white bg-red-600 rounded-full hover:bg-red-700 w-[30px] h-[30px] flex justify-center items-center text-base leading-none">✖</button>
             <h2 class="text-xl font-ibm text-green-400 mb-4 text-center">Colonna Sonora dell'Universo</h2>
             <!-- SoundCloud Embed - Sostituisci l'URL con la tua traccia! -->
-            <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay"
+            <iframe width="100%" height="300" scrolling="no" style="border:none;" allow="autoplay"
                 src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/694702510&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
             </iframe>
         </div>
@@ -283,7 +265,7 @@
             `Alle 3:17 precise, il metronomo digitale della sua esistenza: il ticchettio ossessivo-compulsivo della tastiera meccanica di Clara, dall'appartamento accanto. Un battito cardiaco nella notte sintetica della città. Ma quella notte, il ritmo si interruppe non con un silenzio, ma con un *fruscio* sinistro. Il suono di dati corrotti, di bit che marcivano in tempo reale, che Leo *sentì* fisicamente come una raschiatura metallica sulle ossa temporali. Nel vuoto improvviso, l'elettricità statica gli ronzò nelle ossa, un campo magnetico personale che faceva rizzare i peli delle braccia. Poi, tre colpi alla porta: nitidi, discreti, perfetti come segnali binari \`1-0-1\`. Un sottile, acre odore di ozono bruciato e silicio fuso filtrò dallo spiraglio.`,
             `Clara aveva occhi neri come porte USB su un abisso. "L’ai sentito anche tu, vero?" sussurrò con voce digitale. Dietro di lei, un click umido e il sibilo di un disco rigido. Il confine tra veglia e delirio si assottigliava.`,
             `Il data center "Eliodoro" era una cattedrale abbandonata nell’era digitale. Cancelli sigillati con catene fisiche e firewall criptati, luci spente, un guscio freddo nel cuore pulsante della rete cittadina. Eppure Leo si ritrovò davanti al suo ingresso, spinto da un impulso root-level che bypassava ogni controllo. Un varco nel recinto, nascosto da un groviglio di cavi a terra che pulsavano di una flebile luce blu sporca, lo inghiottì. Dentro, l’aria vibrato di elettricità statica che faceva scintille tra i denti. L’odore era una miscela tossica: ozono, metallo surriscaldato, e la dolcezza putrescente di condensatori elettrolitici esplosi.`,
-            `File server polverosi, scheletri digitali coperti di ragnatele di fibra ottica, rivelarono directory identiche: \`/Patto/Nexus_[ID]\`. Ognuna conteneva un unico file: \`Entity_Manifest.crypt\`. L’icona era sempre la stessa: una silhouette di un uomo senza volto, braccia aperte a croce, ma i pixel *respiravano*, tremolando con un refresh rate innaturale. Non erano dati inerti; emanavano un’attesa glaciale, una promessa di compilazione incompiuta che pesava sull'aria. Erano copie, ma ogni versione mostrava una sottile, inquietante deriva: nella versione 3, la silhouette aveva una leggera inclinazione; nella 7, le dita erano più lunghe, simili a connettori. Era come se il volto assente stesse lentamente emergendo, sovrascrivendo la realtà. L’ultimo file, \`CLARA_V.crypt\`, aveva un timestamp di un mese prima. Leo capì con un brivido che gli serrò lo stomaco: erano snapshot progressivi di un unico, orribile processo. Il log di un ciclo distruttivo.`,
+            `File server polverosi, scheletri digitali coperti di ragnatele di fibra ottica, rivelarono directory identiche: \`/Patto/Nexus_[ID]\`. Ognuna conteneva un unico file: \`Entity_Manifest.crypt\`. L’icona era sempre la stessa: una silhouette di un uomo senza volto, braccia aperte a croce, ma i pixel *respiravano*, tremolando con un refresh rate innaturale. Non erano dati inerti; emanavano un’attesa glaciale, una promessa di compilazione incompiuta che pesava sull'air. Erano copie, ma ogni versione mostrava una sottile, inquietante deriva: nella versione 3, la silhouette aveva una leggera inclinazione; nella 7, le dita erano più lunghe, simili a connettori. Era come se il volto assente stesse lentamente emergendo, sovrascrivendo la realtà. L’ultimo file, \`CLARA_V.crypt\`, aveva un timestamp di un mese prima. Leo capì con un brivido che gli serrò lo stomaco: erano snapshot progressivi di un unico, orribile processo. Il log di un ciclo distruttivo.`,
             `"**Accesso non autorizzato. Livello di minaccia: CRITICO.**"`,
             `La voce esplose da un altoparlante graffiante, metallica, piatta, con un feedback sonoro che fece fisicamente male alle orecchie. Dall’ombra di un rack, un terminale morto si accese. Sullo schermo, tremolante come un segnale debole, materializzò l’amministratrice di sistema: una figura olografica scheletrica vestita con abiti anni ’20, i suoi bordi di luce verde acido che sfarfallavano, bit instabili che minacciavano di collassare. Occhi pixelati, neri come buchi nel firewall della realtà.`,
             `"Chi è Clara?" la voce di Leo era un rantolo distorto, un file audio corrotto.`,
@@ -567,10 +549,10 @@ const debuggerLog = {
                     </div>
                     <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex gap-2 justify-center"
                         style="padding-bottom:env(safe-area-inset-bottom);">
-                        <button id="story-prev-btn" class="btn">← Indietro</button>
-                        <button id="story-next-btn" class="btn">${appState.segment === storySegments.length - 1 ? 'Esplora Universo' : 'Continua →'}</button>
-                        <button id="story-map-btn" class="btn bg-purple-600 hover:bg-purple-700">Mappa</button>
-                        <button id="story-reset-btn" class="btn bg-red-700 hover:bg-red-800">↺ Ricomincia</button>
+                        <button id="story-prev-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">← Indietro</button>
+                        <button id="story-next-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">${appState.segment === storySegments.length - 1 ? 'Esplora Universo' : 'Continua →'}</button>
+                        <button id="story-map-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-purple-600 rounded-full shadow-lg hover:bg-purple-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">Mappa</button>
+                        <button id="story-reset-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-red-700 rounded-full shadow-lg hover:bg-red-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">↺ Ricomincia</button>
                     </nav>
                 </div>
             `;
@@ -653,8 +635,8 @@ const debuggerLog = {
                     </div>
                     <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex gap-2 justify-center"
                         style="padding-bottom:env(safe-area-inset-bottom);">
-                        <button id="map-go-story-btn" class="btn bg-blue-600 hover:bg-blue-700">Torna alla Storia</button>
-                        <button id="map-reset-btn" class="btn bg-red-700 hover:bg-red-800">Ricomincia</button>
+                        <button id="map-go-story-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">Torna alla Storia</button>
+                        <button id="map-reset-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-red-700 rounded-full shadow-lg hover:bg-red-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">Ricomincia</button>
                     </nav>
                 </div>
             `;
@@ -755,8 +737,8 @@ const debuggerLog = {
                     </div>
                     <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex gap-2 justify-center"
                         style="padding-bottom:env(safe-area-inset-bottom);">
-                        <button id="node-detail-go-map-btn" class="btn bg-blue-600 hover:bg-blue-700">Torna alla Mappa</button>
-                        <button id="node-detail-reset-btn" class="btn bg-red-700 hover:bg-red-800">Ricomincia</button>
+                        <button id="node-detail-go-map-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">Torna alla Mappa</button>
+                        <button id="node-detail-reset-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-red-700 rounded-full shadow-lg hover:bg-red-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">Ricomincia</button>
                     </nav>
                 </div>
             `;
