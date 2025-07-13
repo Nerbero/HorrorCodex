@@ -652,7 +652,7 @@ const debuggerLog = {
             // Re-attacca gli event listener dopo che l'innerHTML è stato aggiornato
             document.querySelectorAll('#main-page-container button[data-node-key]').forEach(button => {
                 button.onclick = (event) => {
-                    const nodeKey = event.currentTarget.dataset.node-key;
+                    const nodeKey = event.currentTarget.dataset.nodeKey; // Correzione da data-node-key a data-nodeKey
                     appState.page = nodeKey;
                     appState.visited.add(nodeKey);
                     appState.userSoul += 0.15;
@@ -751,7 +751,7 @@ const debuggerLog = {
             // Re-attacca gli event listener dopo che l'innerHTML è stato aggiornato
             document.querySelectorAll('#main-page-container button[data-node-key]').forEach(button => {
                 button.onclick = (event) => {
-                    const targetNodeKey = event.currentTarget.dataset.node-key;
+                    const targetNodeKey = event.currentTarget.dataset.nodeKey; // Correzione da data-node-key a data-nodeKey
                     appState.page = targetNodeKey;
                     appState.visited.add(targetNodeKey);
                     appState.userSoul += 0.15;
