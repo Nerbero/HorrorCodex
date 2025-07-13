@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universo v0.3 Minimal</title>
+    <title>Cosmic Horror Codex - Il Capolavoro</title>
     <!-- Tailwind CSS per utility class -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts per Inter, IBM Plex Mono e Share Tech Mono -->
@@ -11,7 +11,7 @@
     <style>
         /* Stili base per il corpo, la scrollbar e lo sfondo animato */
         html, body {
-            height: 100%; /* Assicura che html e body occupino l'intera altezza del viewport */
+            height: 100%;
             margin: 0;
             padding: 0;
             overflow-y: auto;
@@ -38,13 +38,13 @@
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(to bottom, #ff00ff, #00ffff);
         }
+
         /* Animazione per lo sfondo sfumato */
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        /* Spostato bg-animated-gradient sul body o sul contenitore più esterno */
         .bg-animated-gradient {
             background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0a0a12 100%);
             background-size: 400% 400%;
@@ -52,34 +52,19 @@
         }
 
         /* Effetti Glitch e VHS */
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100vh); }
+        /* Questi effetti saranno controllati dinamicamente tramite JS e classi */
+        .effect-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;
         }
-        .scanline-effect { animation: scanline 8s linear infinite; }
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-        .fade-in-out { animation: fadeInOut 3s infinite; }
-        @keyframes static-flicker {
-            0%, 100% { opacity: 0.1; }
-            50% { opacity: 0.25; }
-        }
-        @keyframes horizontal-lines {
-            0% { background-position: 0% 0; }
-            100% { background-position: 0% 100%; }
-        }
-        @keyframes color-shift {
-            0% { filter: hue-rotate(0deg) saturate(100%) contrast(100%); }
-            25% { filter: hue-rotate(15deg) saturate(150%) contrast(120%); }
-            50% { filter: hue-rotate(-15deg) saturate(130%) contrast(110%); }
-            75% { filter: hue-rotate(10deg) saturate(140%) contrast(115%); }
-            100% { filter: hue-rotate(0deg) saturate(100%) contrast(100%); }
-        }
-        @keyframes ghost-flicker {
-            0%, 100% { transform: scaleY(1.02) translateX(2px); }
-            50% { transform: scaleY(1.01) translateX(-2px); }
+
+        .glitch-active .glitch-layer {
+            background-image: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(255, 0, 255, calc(var(--int) * 0.08)) 50%);
+            background-size: 100% 3px;
+            background-repeat: repeat;
+            opacity: calc(var(--int) * 0.8);
+            mix-blend-mode: screen;
+            animation: glitch-anim calc(0.2 / (var(--int) + 0.05))s infinite;
+            z-index: 20;
         }
         @keyframes glitch-anim {
             0% { clip-path: inset(0 0 0 0); transform: translate(0, 0); }
@@ -94,170 +79,201 @@
             90% { clip-path: inset(40% 0 0 0); transform: translate(1px, -1px); }
             100% { clip-path: inset(0 0 0 0); transform: translate(0, 0); }
         }
-        .vhf-interference-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; /* Z-index più basso */
+
+        .vhs-active .vhf-interference-layer {
             background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0gAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMiAxNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vL3wzLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkVCMEU4RjY3MTQ2MjUxMUU1ODk4OEZCMUI3NjcyRjJEIiBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkVCMEU4RjY3MTQ2MjUxMUU1ODk4OEZCMUI3NjcyRjJEIj4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InciPz5CN0wxbAAAAGklEQVR42mJgYGDg/w/AAgAAAP//AgAEAAACDQAAVz7N+AAAAABJRU5ErkJggg==');
             background-repeat: repeat;
             animation: static-flicker 0.15s infinite alternate;
             opacity: 0.15;
             filter: grayscale(60%) contrast(150%) brightness(1.2);
         }
-        .vhf-horizontal-lines {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        .vhs-active .vhf-horizontal-lines {
             background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3) 1px, transparent 1px, transparent 4px);
             background-size: 100% 40px;
             animation: horizontal-lines 8s linear infinite;
             opacity: 0.25;
             mix-blend-mode: overlay;
-            pointer-events: none; /* Aggiunto */
         }
-        .vhf-color-shift {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        @keyframes horizontal-lines {
+            0% { background-position: 0% 0; }
+            100% { background-position: 0% 100%; }
+        }
+        .vhs-active .vhf-color-shift {
             animation: color-shift 3s infinite alternate;
             mix-blend-mode: hard-light;
             opacity: 0.3;
-            pointer-events: none; /* Aggiunto */
         }
-        .vhf-scanlines {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        @keyframes color-shift {
+            0% { filter: hue-rotate(0deg) saturate(100%) contrast(100%); }
+            25% { filter: hue-rotate(15deg) saturate(150%) contrast(120%); }
+            50% { filter: hue-rotate(-15deg) saturate(130%) contrast(110%); }
+            75% { filter: hue-rotate(10deg) saturate(140%) contrast(115%); }
+            100% { filter: hue-rotate(0deg) saturate(100%) contrast(100%); }
+        }
+        .vhs-active .vhf-scanlines {
             background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.4) 51%);
             background-size: 100% 4px;
             opacity: 0.4;
-            pointer-events: none;
-            z-index: 25; /* Z-index più basso */
+            z-index: 25;
         }
-        .vhf-ghosting {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        .vhs-active .vhf-ghosting {
             filter: blur(1px) opacity(0.2);
             transform: scaleY(1.02) translateX(2px);
             animation: ghost-flicker 0.3s infinite alternate;
             mix-blend-mode: screen;
-            pointer-events: none; /* Aggiunto */
         }
-        .glitch-layer {
-            background-image: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(255, 0, 255, calc(var(--int) * 0.08)) 50%);
-            background-size: 100% 3px;
-            background-repeat: repeat;
-            opacity: calc(var(--int) * 0.8);
-            mix-blend-mode: screen;
-            animation: glitch-anim calc(0.2 / (var(--int) + 0.05))s infinite;
-            z-index: 20; /* Z-index più basso */
+        @keyframes ghost-flicker {
+            0%, 100% { transform: scaleY(1.02) translateX(2px); }
+            50% { transform: scaleY(1.01) translateX(-2px); }
         }
 
-        /* Stili per il modal della musica */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999; /* Z-index molto alto per essere sempre sopra */
-            backdrop-filter: blur(5px);
+        /* Stili per il pannello delle impostazioni */
+        .settings-panel {
+            transition: transform 0.3s ease-out;
+            transform: translateX(100%); /* Nascosto di default */
         }
-
-        .modal-content {
-            background-color: #1a1a2e;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
-            max-width: 90%;
-            max-height: 90%;
-            overflow: auto;
-            position: relative;
-            border: 1px solid #00ffcc;
+        .settings-panel.open {
+            transform: translateX(0); /* Aperto */
         }
     </style>
 </head>
-<body>
-    <!-- Contenitore principale dell'applicazione con sfondo animato e altezza minima dello schermo -->
-    <div class="relative min-h-screen bg-black text-green-400 font-mono overflow-hidden bg-animated-gradient flex flex-col">
-        <!-- Livello Dimensionale (sfondo animato) -->
-        <div id="dimensional-layer" class="fixed inset-0 z-0 pointer-events-none" style="background: linear-gradient(0deg, rgba(0,255,0,0.1), rgba(0,0,255,0.1));"></div>
+<body class="bg-animated-gradient">
+    <!-- Livello Dimensionale (sfondo animato) -->
+    <div id="dimensional-layer" class="fixed inset-0 z-0 pointer-events-none" style="background: linear-gradient(0deg, rgba(0,255,0,0.1), rgba(0,0,255,0.1));"></div>
 
-        <!-- Overlay Glitch (inizialmente nascosto o con intensità 0) -->
-        <div id="glitch-overlay" class="fixed inset-0 pointer-events-none glitch-layer" style="--int: 0;"></div>
-
-        <!-- Effetti VHS -->
-        <div class="vhf-interference-layer">
-            <div class="vhf-horizontal-lines"></div>
-            <div class="vhf-color-shift"></div>
-            <div class="vhf-ghosting"></div>
-        </div>
+    <!-- Effetti Glitch e VHS (controllati da classi JS) -->
+    <div id="glitch-effect-container" class="effect-layer glitch-layer" style="--int: 0;"></div>
+    <div id="vhs-effect-container" class="effect-layer">
+        <div class="vhf-interference-layer"></div>
+        <div class="vhf-horizontal-lines"></div>
+        <div class="vhf-color-shift"></div>
+        <div class="vhf-ghosting"></div>
         <div class="vhf-scanlines"></div>
-
-        <!-- Contenuto principale dell'applicazione (flex-grow per occupare lo spazio disponibile) -->
-        <div class="relative z-30 flex flex-col flex-grow p-4">
-            <header class="flex-shrink-0 text-center p-4 bg-gray-900/80 rounded-lg mb-4">
-                <h1 id="main-title" class="text-3xl font-bold tracking-wider">
-                    COSMIC HORROR CODEX
-                    <span id="main-glyph"></span>
-                </h1>
-                <div id="progress-bar" class="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden mt-3" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                    <div class="h-full bg-green-500" style="width: 0%; transition: width .5s;"></div>
-                </div>
-            </header>
-
-            <!-- Pulsante Musica -->
-            <button id="music-btn" class="fixed top-4 left-4 z-50 p-3 bg-purple-700 text-white rounded-full shadow-lg hover:bg-purple-800 transition transform hover:scale-110" aria-label="Apri il player musicale">
-                🎵
-            </button>
-
-            <!-- Display dell'Anima -->
-            <div id="soul-display" class="fixed top-4 right-4 bg-gray-900/80 text-purple-400 p-3 rounded-lg shadow-lg z-50 text-sm font-fira border border-purple-600" aria-live="polite">
-                <span class="inline-block mr-1">🧠</span> Anima: <span id="soul-value">0.00</span>
-            </div>
-
-            <!-- Contenitore principale per le pagine (Storia, Mappa, Dettagli Nodo) - flex-grow per riempire lo spazio -->
-            <div id="main-page-container" class="flex-grow flex flex-col items-center justify-center">
-                <!-- Il contenuto delle pagine verrà iniettato qui dal JavaScript -->
-            </div>
-
-            <!-- Aside per i segreti -->
-            <aside id="secrets-aside" class="flex-shrink-0 fixed bottom-4 right-4 text-purple-400 space-y-1 hidden" aria-live="polite" role="region">
-                <!-- I segreti verranno iniettati qui dal JavaScript -->
-            </aside>
-        </div>
     </div>
 
-    <!-- Modal per il player musicale -->
-    <div id="music-modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="music-modal-title">
-        <div class="modal-content w-full md:w-3/4 lg:w-1/2 xl:w-2/5">
-            <button id="music-modal-close-btn" class="absolute top-2 right-2 p-2 text-white bg-red-600 rounded-full hover:bg-red-700 w-[30px] h-[30px] flex justify-center items-center text-base leading-none">✖</button>
-            <h2 id="music-modal-title" class="text-xl font-ibm text-green-400 mb-4 text-center">Colonna Sonora dell'Universo</h2>
-            <!-- SoundCloud Embed - Sostituisci l'URL con la tua traccia! -->
-            <iframe id="soundcloud-player" width="100%" height="300" scrolling="no" style="border:none;" allow="autoplay"
-                data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/694702510&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true&loop=true">
-            </iframe>
+    <!-- Contenitore principale dell'applicazione -->
+    <div class="relative min-h-screen flex flex-col p-4 text-green-400 font-mono z-30">
+        <!-- Header -->
+        <header class="flex-shrink-0 text-center p-4 bg-gray-900/80 rounded-lg mb-4 shadow-lg border border-purple-700">
+            <h1 id="main-title" class="text-3xl md:text-4xl font-bold tracking-wider text-indigo-400">
+                COSMIC HORROR CODEX
+                <span id="main-glyph" class="inline-block transition-transform duration-100 ease-linear"></span>
+            </h1>
+            <div id="progress-bar-container" class="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden mt-3" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div id="progress-bar-fill" class="h-full bg-green-500" style="width: 0%; transition: width .5s;"></div>
+            </div>
+        </header>
+
+        <!-- Pulsanti di controllo globali (Musica, Impostazioni, Anima) -->
+        <div class="fixed top-4 left-4 z-50 flex flex-col space-y-2">
+            <button id="music-toggle-btn" class="p-3 bg-purple-700 text-white rounded-full shadow-lg hover:bg-purple-800 transition transform hover:scale-110" aria-label="Attiva/Disattiva musica di sottofondo">
+                🎵
+            </button>
+            <button id="settings-toggle-btn" class="p-3 bg-blue-700 text-white rounded-full shadow-lg hover:bg-blue-800 transition transform hover:scale-110" aria-label="Apri/Chiudi impostazioni">
+                ⚙️
+            </button>
         </div>
+
+        <div id="soul-display" class="fixed top-4 right-4 bg-gray-900/80 text-purple-400 p-3 rounded-lg shadow-lg z-50 text-sm font-fira border border-purple-600" aria-live="polite">
+            <span class="inline-block mr-1">🧠</span> Anima: <span id="soul-value">0.00</span>
+        </div>
+
+        <!-- Contenuto principale dell'applicazione (Storia, Mappa, Dettagli Nodo) -->
+        <main id="main-page-container" class="flex-grow flex flex-col items-center justify-center p-4">
+            <!-- Il contenuto delle pagine verrà iniettato qui dal JavaScript -->
+        </main>
+
+        <!-- Aside per i segreti -->
+        <aside id="secrets-aside" class="flex-shrink-0 fixed bottom-4 right-4 bg-gray-900/80 text-purple-400 p-3 rounded-lg shadow-lg z-50 text-sm font-fira border border-purple-600 space-y-1 hidden" aria-live="polite" role="region">
+            <h3 class="font-bold text-lg mb-2">Segreti Svelati:</h3>
+            <!-- I segreti verranno iniettati qui dal JavaScript -->
+        </aside>
+    </div>
+
+    <!-- Pannello delle Impostazioni -->
+    <div id="settings-panel" class="settings-panel fixed top-0 right-0 h-full w-64 bg-gray-900/95 border-l border-blue-700 shadow-2xl p-4 z-[10000]">
+        <button id="settings-close-btn" class="absolute top-2 right-2 p-2 text-white bg-red-600 rounded-full hover:bg-red-700 w-[30px] h-[30px] flex justify-center items-center text-base leading-none" aria-label="Chiudi impostazioni">✖</button>
+        <h2 class="text-xl font-bold text-blue-400 mb-4">Impostazioni</h2>
+
+        <div class="mb-4">
+            <h3 class="text-lg font-semibold text-gray-300 mb-2">Effetti Grafici</h3>
+            <label class="flex items-center space-x-2 cursor-pointer mb-2">
+                <input type="checkbox" id="toggle-glitch" class="form-checkbox h-5 w-5 text-purple-600 rounded" checked>
+                <span class="text-gray-200">Effetti Glitch</span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer">
+                <input type="checkbox" id="toggle-vhs" class="form-checkbox h-5 w-5 text-purple-600 rounded" checked>
+                <span class="text-gray-200">Effetti VHS</span>
+            </label>
+        </div>
+
+        <div class="mb-4">
+            <h3 class="text-lg font-semibold text-gray-300 mb-2">Audio</h3>
+            <label class="flex items-center space-x-2 cursor-pointer">
+                <input type="checkbox" id="toggle-music-autoplay" class="form-checkbox h-5 w-5 text-purple-600 rounded">
+                <span class="text-gray-200">Autoplay Musica (se permesso)</span>
+            </label>
+        </div>
+
+        <button id="reset-app-btn" class="mt-8 w-full px-4 py-3 text-sm font-medium text-white transition bg-red-700 rounded-full shadow-lg hover:bg-red-800 focus:outline-none transform hover:scale-105">
+            Reset Applicazione
+        </button>
+    </div>
+
+    <!-- Player musicale di SoundCloud (nascosto, controllato via JS) -->
+    <div id="music-player-container" class="fixed bottom-4 left-4 z-40 hidden">
+        <iframe id="soundcloud-player" width="200" height="100" scrolling="no" style="border:none;" allow="autoplay"
+            data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/694702510&color=%23ff5500&auto_play=true&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false&loop=true">
+        </iframe>
     </div>
 
     <script>
         // Costanti globali
         const NEXUS_OSCILLATION_RATE = 0.82;
         const SOUL_DECAY_RATE = 0.0025;
-        const TYPING_SPEED = 50;
+        const TYPING_SPEED = 30; // Reso più veloce per un'esperienza più dinamica
         const ELDRITCH_GLYPHS = ["䷀","䷁","䷂","䷃","䷄","䷅","䷆","䷇","§","¶","†","‡","•","⁂","⁑","⸘","⸮","⸗","⸚","⸛","⸞","⸟","⸠","⸡","⸢","⸣","⸤","⸥","⸦","⸧","⸨","⸩","⸪","⸫","⸬","⸭","⸮","ⸯ","⸰","⸱","⸲","⸳","⸴","⸵","⸶","⸷","⸸","⸹","⸺","⸻","⸼","⸽","⸾","⸿"];
 
-        // Funzioni helper per lo stile e le icone
-        function getTypeStyle(type) {
-            const styles = {
-                tech:        { bg: 'rgba(0,255,204,0.25)', color: '#00ffcc', border: '#00ffcc' },
-                character:   { bg: 'rgba(255,102,204,0.25)', color: '#ff66cc', border: '#ff66cc' },
-                lore:        { bg: 'rgba(170,102,255,0.25)', color: '#aa66ff', border: '#aa66ff' },
-                meta:        { bg: 'rgba(255,204,0,0.25)', color: '#ffcc00', border: '#ffcc00' },
-                'bio-digital': { bg: 'rgba(100,200,255,0.25)', color: '#64c8ff', border: '#64c8ff' }
-            };
-            return styles[type] ?? { bg: 'rgba(170,170,170,0.25)', color: '#aaaaaa', border: '#aaaaaa' };
-        }
+        // Riferimenti agli elementi DOM
+        const mainPageContainer = document.getElementById('main-page-container');
+        const mainTitle = document.getElementById('main-title');
+        const mainGlyph = document.getElementById('main-glyph');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const progressBarContainer = document.getElementById('progress-bar-container');
+        const soulValueDisplay = document.getElementById('soul-value');
+        const secretsAside = document.getElementById('secrets-aside');
+        const dimensionalLayer = document.getElementById('dimensional-layer');
+        const glitchEffectContainer = document.getElementById('glitch-effect-container');
+        const vhsEffectContainer = document.getElementById('vhs-effect-container');
+        const musicToggleButton = document.getElementById('music-toggle-btn');
+        const settingsToggleButton = document.getElementById('settings-toggle-btn');
+        const settingsPanel = document.getElementById('settings-panel');
+        const settingsCloseButton = document.getElementById('settings-close-btn');
+        const toggleGlitchCheckbox = document.getElementById('toggle-glitch');
+        const toggleVhsCheckbox = document.getElementById('toggle-vhs');
+        const toggleMusicAutoplayCheckbox = document.getElementById('toggle-music-autoplay');
+        const resetAppButton = document.getElementById('reset-app-btn');
+        const soundcloudPlayer = document.getElementById('soundcloud-player');
+        const musicPlayerContainer = document.getElementById('music-player-container');
 
-        function getTypeIcon(type) {
-            const icons = { tech: '🖥️', character: '👤', lore: '📜', meta: '🌀', 'bio-digital': '🧬' };
-            return icons[type] ?? '🔗';
-        }
+        // Variabili di stato globali
+        let appState = {
+            page: 'story',
+            segment: 0,
+            visited: new Set(),
+            userSoul: 0,
+            glyphRot: 0,
+            dimPhase: 0,
+            glitchInt: 0,
+            corruption: 0,
+            secrets: [],
+            isMusicPlaying: false,
+            effects: {
+                glitch: true,
+                vhs: true
+            },
+            musicAutoplay: false // Nuova impostazione per l'autoplay
+        };
 
         // Dati dell'applicazione (storySegments e universeContent)
         const storySegments = [
@@ -411,43 +427,20 @@ const debuggerLog = {
             }
         };
 
-        // Variabili di stato globali
-        let appState = {
-            page: 'story',
-            segment: 0,
-            visited: new Set(),
-            userSoul: 0,
-            glyphRot: 0,
-            dimPhase: 0,
-            glitchInt: 0,
-            corruption: 0,
-            secrets: []
-        };
-
-        // Riferimenti agli elementi DOM
-        const mainPageContainer = document.getElementById('main-page-container');
-        const mainTitle = document.getElementById('main-title');
-        const mainGlyph = document.getElementById('main-glyph');
-        const progressBar = document.getElementById('progress-bar');
-        const soulValueDisplay = document.getElementById('soul-value');
-        const secretsAside = document.getElementById('secrets-aside');
-        const dimensionalLayer = document.getElementById('dimensional-layer');
-        const glitchOverlay = document.getElementById('glitch-overlay');
-        const musicBtn = document.getElementById('music-btn');
-        const musicModalOverlay = document.getElementById('music-modal-overlay');
-        const musicModalCloseBtn = document.getElementById('music-modal-close-btn');
-
         // Funzioni per la persistenza dello stato in localStorage
         function saveState() {
             const stateToSave = { ...appState, visited: Array.from(appState.visited) };
-            localStorage.setItem('cosmicHorror', JSON.stringify(stateToSave));
+            localStorage.setItem('cosmicHorrorCodexState', JSON.stringify(stateToSave));
         }
 
         function loadState() {
             try {
-                const savedState = JSON.parse(localStorage.getItem('cosmicHorror'));
+                const savedState = JSON.parse(localStorage.getItem('cosmicHorrorCodexState'));
                 if (savedState) {
                     appState = { ...savedState, visited: new Set(savedState.visited) };
+                    // Ensure effects settings are loaded correctly, with defaults if missing
+                    appState.effects = savedState.effects || { glitch: true, vhs: true };
+                    appState.musicAutoplay = savedState.musicAutoplay || false;
                 }
             } catch (e) {
                 console.error("Failed to load state from localStorage:", e);
@@ -461,7 +454,10 @@ const debuggerLog = {
                     dimPhase: 0,
                     glitchInt: 0,
                     corruption: 0,
-                    secrets: []
+                    secrets: [],
+                    isMusicPlaying: false,
+                    effects: { glitch: true, vhs: true },
+                    musicAutoplay: false
                 };
             }
         }
@@ -514,14 +510,15 @@ const debuggerLog = {
 
             clearInterval(corruptionInterval);
             corruptionInterval = setInterval(() => {
-                if (!isTypingActive && appState.page === 'story' && appState.segment === storySegments.length - 1) {
+                // Apply glitch effect only if enabled in settings
+                if (appState.effects.glitch && !isTypingActive && appState.page === 'story' && appState.segment === storySegments.length - 1) {
                     const arr = originalText.split('');
                     const i = Math.floor(Math.random() * arr.length);
                     const glyph = ELDRITCH_GLYPHS[Math.floor(Math.random() * ELDRITCH_GLYPHS.length)];
                     arr[i] = Math.random() < 0.7 ? glyph : String.fromCharCode(33 + Math.floor(Math.random() * 94));
                     targetElement.textContent = arr.join('');
                     setTimeout(() => {
-                        if (!isTypingActive && appState.page === 'story' && appState.segment === storySegments.length - 1) {
+                        if (appState.effects.glitch && !isTypingActive && appState.page === 'story' && appState.segment === storySegments.length - 1) {
                             targetElement.textContent = originalText;
                         }
                     }, 80);
@@ -538,21 +535,19 @@ const debuggerLog = {
         function renderStoryDisplay() {
             stopCorruptionEffect();
             const segmentText = storySegments[appState.segment];
-            // La navHeight non è più usata per calcolare l'altezza del contenuto grazie a flex-grow
-            const navHeight = '180px'; // Usata solo per il padding-bottom della nav
 
             mainPageContainer.innerHTML = `
-                <div class="flex flex-col h-full w-full max-w-3xl mx-auto">
-                    <div class="flex-grow overflow-auto p-6 bg-gray-800/90 rounded-lg shadow-xl">
+                <div class="flex flex-col h-full w-full max-w-3xl mx-auto bg-gray-800/90 rounded-lg shadow-xl border border-gray-700">
+                    <div class="flex-grow overflow-auto p-6">
                         <p id="story-text-content" class="text-lg leading-relaxed text-justify whitespace-pre-wrap text-gray-200 font-ibm"></p>
                         <div class="text-right text-gray-400 mt-4 text-sm italic">${appState.segment + 1}/${storySegments.length}</div>
                     </div>
-                    <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex gap-2 justify-center"
+                    <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex flex-wrap gap-2 justify-center rounded-b-lg"
                         style="padding-bottom:env(safe-area-inset-bottom);">
-                        <button id="story-prev-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">← Indietro</button>
-                        <button id="story-next-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">${appState.segment === storySegments.length - 1 ? 'Esplora Universo' : 'Continua →'}</button>
-                        <button id="story-map-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-purple-600 rounded-full shadow-lg hover:bg-purple-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">Mappa</button>
-                        <button id="story-reset-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-red-700 rounded-full shadow-lg hover:bg-red-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">↺ Ricomincia</button>
+                        <button id="story-prev-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]" aria-label="Segmento precedente della storia">← Indietro</button>
+                        <button id="story-next-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]" aria-label="${appState.segment === storySegments.length - 1 ? 'Esplora l\'Universo' : 'Continua la storia'}">${appState.segment === storySegments.length - 1 ? 'Esplora Universo' : 'Continua →'}</button>
+                        <button id="story-map-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-purple-600 rounded-full shadow-lg hover:bg-purple-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]" aria-label="Vai alla mappa dell'universo">Mappa</button>
+                        <button id="story-reset-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-red-700 rounded-full shadow-lg hover:bg-red-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]" aria-label="Ricomincia l'applicazione">↺ Ricomincia</button>
                     </nav>
                 </div>
             `;
@@ -566,7 +561,6 @@ const debuggerLog = {
 
             // Re-attacca gli event listener dopo che l'innerHTML è stato aggiornato
             document.getElementById('story-next-btn').onclick = () => {
-                console.log('Next button clicked'); // Debug log
                 if (!isTypingActive) {
                     if (appState.segment < storySegments.length - 1) {
                         appState.segment++;
@@ -579,7 +573,6 @@ const debuggerLog = {
                 }
             };
             document.getElementById('story-prev-btn').onclick = () => {
-                console.log('Previous button clicked'); // Debug log
                 if (!isTypingActive && appState.segment > 0) {
                     appState.segment--;
                     renderPage();
@@ -587,20 +580,17 @@ const debuggerLog = {
                 }
             };
             document.getElementById('story-map-btn').onclick = () => {
-                console.log('Mappa button clicked from Story'); // Debug log
                 appState.page = 'universeMap';
                 renderPage();
                 saveState();
             };
             document.getElementById('story-reset-btn').onclick = () => {
-                console.log('Ricomincia button clicked from Story'); // Debug log
                 resetApplication();
             };
         }
 
         function renderUniverseMapDisplay() {
             stopCorruptionEffect();
-            // navHeight non è più usata per calcolare l'altezza del contenuto
             const windowWidth = window.innerWidth;
             const cols = windowWidth < 768 ? '1fr' : 'repeat(auto-fit,minmax(260px,1fr))';
 
@@ -615,9 +605,10 @@ const debuggerLog = {
                     <button data-node-key="${key}"
                         class="p-4 flex flex-col items-center justify-center rounded-lg shadow-md transform hover:scale-105
                         ${visited ? 'bg-green-800/90 border-green-500' : 'bg-gray-700/90 border-indigo-500'}"
-                        style="box-shadow: ${visited ? '0 0 15px rgba(0,255,204,0.5)' : '0 0 10px rgba(255,102,204,0.3)'};">
-                        <span class="font-semibold">${visited ? '📌 ' : ''}${node.title}</span>
-                        <span class="mt-1 px-2 py-1 rounded-full text-xs"
+                        style="box-shadow: ${visited ? '0 0 15px rgba(0,255,204,0.5)' : '0 0 10px rgba(255,102,204,0.3)'};"
+                        aria-label="Vai al nodo ${node.title}">
+                        <span class="font-semibold text-gray-100">${visited ? '📌 ' : ''}${node.title}</span>
+                        <span class="mt-1 px-2 py-1 rounded-full text-xs font-ibm"
                             style="background-color: ${typeStyle.bg}; color: ${typeStyle.color}; border: 1px solid ${typeStyle.border};">
                             ${icon} ${node.type.toUpperCase()}
                         </span>
@@ -626,17 +617,17 @@ const debuggerLog = {
             }
 
             mainPageContainer.innerHTML = `
-                <div class="flex flex-col h-full w-full max-w-3xl mx-auto">
+                <div class="flex flex-col h-full w-full max-w-3xl mx-auto bg-gray-800/90 rounded-lg shadow-xl border border-gray-700">
                     <h1 class="text-center text-3xl text-indigo-400 p-3">Mappa dell'Universo</h1>
-                    <div class="flex-grow overflow-auto bg-gray-800/90 p-4 rounded-lg shadow-xl">
+                    <div class="flex-grow overflow-auto p-4">
                         <div class="grid gap-4" style="grid-template-columns: ${cols}">
                             ${mapContentHtml}
                         </div>
                     </div>
-                    <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex gap-2 justify-center"
+                    <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex flex-wrap gap-2 justify-center rounded-b-lg"
                         style="padding-bottom:env(safe-area-inset-bottom);">
-                        <button id="map-go-story-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">Torna alla Storia</button>
-                        <button id="map-reset-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-red-700 rounded-full shadow-lg hover:bg-red-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">Ricomincia</button>
+                        <button id="map-go-story-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]" aria-label="Torna alla storia">Torna alla Storia</button>
+                        <button id="map-reset-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-red-700 rounded-full shadow-lg hover:bg-red-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]" aria-label="Ricomincia l'applicazione">Ricomincia</button>
                     </nav>
                 </div>
             `;
@@ -644,7 +635,6 @@ const debuggerLog = {
             // Re-attacca gli event listener dopo che l'innerHTML è stato aggiornato
             document.querySelectorAll('#main-page-container button[data-node-key]').forEach(button => {
                 button.onclick = (event) => {
-                    console.log('Map node button clicked:', event.currentTarget.dataset.nodeKey); // Debug log
                     const nodeKey = event.currentTarget.dataset.nodeKey;
                     appState.page = nodeKey;
                     appState.visited.add(nodeKey);
@@ -656,13 +646,11 @@ const debuggerLog = {
             });
 
             document.getElementById('map-go-story-btn').onclick = () => {
-                console.log('Torna alla Storia button clicked from Map'); // Debug log
                 appState.page = 'story';
                 renderPage();
                 saveState();
             };
             document.getElementById('map-reset-btn').onclick = () => {
-                console.log('Ricomincia button clicked from Map'); // Debug log
                 resetApplication();
             };
         }
@@ -676,15 +664,14 @@ const debuggerLog = {
                 return;
             }
 
-            // navHeight non è più usata per calcolare l'altezza del contenuto
             const typeStyle = getTypeStyle(node.type);
             const icon = getTypeIcon(node.type);
 
             let textContentHtml = '';
             if (Array.isArray(node.text)) {
-                textContentHtml = node.text.map(p => `<p class="mb-4 text-justify">${p}</p>`).join('');
+                textContentHtml = node.text.map(p => `<p class="mb-4 text-justify text-gray-200">${p}</p>`).join('');
             } else {
-                textContentHtml = `<p class="mb-4 text-justify">${node.text}</p>`;
+                textContentHtml = `<p class="mb-4 text-justify text-gray-200">${node.text}</p>`;
             }
 
             let codeBlockHtml = '';
@@ -705,14 +692,15 @@ const debuggerLog = {
                         const visited = appState.visited.has(id);
                         connectionButtonsHtml += `
                             <button data-node-key="${id}"
-                                class="px-3 py-1 rounded-full text-xs font-medium ${visited ? 'bg-green-600' : 'bg-blue-600'} text-white hover:brightness-110">
+                                class="px-3 py-1 rounded-full text-xs font-medium ${visited ? 'bg-green-600' : 'bg-blue-600'} text-white hover:brightness-110"
+                                aria-label="Vai al nodo collegato ${connNode.title}">
                                 ${visited ? '✅' : '🔗'} ${connNode.title}
                             </button>
                         `;
                     }
                 });
                 connectionsHtml = `
-                    <div class="pt-4 border-t border-gray-600">
+                    <div class="pt-4 border-t border-gray-600 mt-4">
                         <h3 class="text-xl text-blue-400 flex items-center mb-3">🔗 Nodi Collegati</h3>
                         <div class="flex flex-wrap gap-2">
                             ${connectionButtonsHtml}
@@ -722,8 +710,8 @@ const debuggerLog = {
             }
 
             mainPageContainer.innerHTML = `
-                <div class="flex flex-col h-full w-full max-w-3xl mx-auto">
-                    <div class="flex-grow overflow-auto p-5 bg-gray-800/90 rounded-lg shadow-xl">
+                <div class="flex flex-col h-full w-full max-w-3xl mx-auto bg-gray-800/90 rounded-lg shadow-xl border border-gray-700">
+                    <div class="flex-grow overflow-auto p-5">
                         <h1 class="text-3xl text-indigo-400 mb-3">${icon} ${node.title}</h1>
                         ${textContentHtml}
                         ${codeBlockHtml}
@@ -735,10 +723,10 @@ const debuggerLog = {
                             </span>
                         </div>
                     </div>
-                    <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex gap-2 justify-center"
+                    <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex flex-wrap gap-2 justify-center rounded-b-lg"
                         style="padding-bottom:env(safe-area-inset-bottom);">
-                        <button id="node-detail-go-map-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">Torna alla Mappa</button>
-                        <button id="node-detail-reset-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-red-700 rounded-full shadow-lg hover:bg-red-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]">Ricomincia</button>
+                        <button id="node-detail-go-map-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]" aria-label="Torna alla mappa">Torna alla Mappa</button>
+                        <button id="node-detail-reset-btn" class="px-4 py-3 text-sm font-medium text-white transition bg-red-700 rounded-full shadow-lg hover:bg-red-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px]" aria-label="Ricomincia l'applicazione">Ricomincia</button>
                     </nav>
                 </div>
             `;
@@ -746,7 +734,6 @@ const debuggerLog = {
             // Re-attacca gli event listener dopo che l'innerHTML è stato aggiornato
             document.querySelectorAll('#main-page-container button[data-node-key]').forEach(button => {
                 button.onclick = (event) => {
-                    console.log('Node detail connection button clicked:', event.currentTarget.dataset.nodeKey); // Debug log
                     const targetNodeKey = event.currentTarget.dataset.nodeKey;
                     appState.page = targetNodeKey;
                     appState.visited.add(targetNodeKey);
@@ -758,13 +745,11 @@ const debuggerLog = {
             });
 
             document.getElementById('node-detail-go-map-btn').onclick = () => {
-                console.log('Torna alla Mappa button clicked from Node Detail'); // Debug log
                 appState.page = 'universeMap';
                 renderPage();
                 saveState();
             };
             document.getElementById('node-detail-reset-btn').onclick = () => {
-                console.log('Ricomincia button clicked from Node Detail'); // Debug log
                 resetApplication();
             };
         }
@@ -794,9 +779,10 @@ const debuggerLog = {
             mainTitle.style.filter = appState.corruption > 0 ? `hue-rotate(${appState.corruption * 30}deg) brightness(${1 - appState.corruption * 0.1})` : 'none';
             mainTitle.style.textShadow = appState.corruption > 1 ? `0 0 8px #ff00ff,0 0 16px rgba(255,0,255,${0.5 + appState.corruption * 0.15})` : 'none';
             mainGlyph.textContent = ELDRITCH_GLYPHS[appState.corruption % ELDRITCH_GLYPHS.length];
-            progressBar.style.width = `${(appState.segment / (storySegments.length - 1 || 1)) * 100}%`;
-            // Update aria-valuenow for progress bar
-            progressBar.setAttribute('aria-valuenow', (appState.segment / (storySegments.length - 1 || 1)) * 100);
+            
+            const progress = (appState.segment / (storySegments.length - 1 || 1)) * 100;
+            progressBarFill.style.width = `${progress}%`;
+            progressBarContainer.setAttribute('aria-valuenow', progress.toFixed(0));
         }
 
         function updateSoulDisplay() {
@@ -804,17 +790,19 @@ const debuggerLog = {
         }
 
         function addSecret(secret) {
-            appState.secrets.push(secret);
-            updateSecretsDisplay();
+            if (!appState.secrets.includes(secret)) { // Avoid duplicate secrets
+                appState.secrets.push(secret);
+                updateSecretsDisplay();
+            }
         }
 
         function updateSecretsDisplay() {
-            if (appState.userSoul > 0.5) {
+            if (appState.userSoul > 0.5 || appState.secrets.length > 0) {
                 secretsAside.classList.remove('hidden');
-                secretsAside.innerHTML = ''; // Pulisci i segreti precedenti
-                appState.secrets.forEach((s, i) => {
+                secretsAside.innerHTML = '<h3 class="font-bold text-lg mb-2">Segreti Svelati:</h3>'; // Pulisci e riaggiungi titolo
+                appState.secrets.forEach((s) => {
                     const div = document.createElement('div');
-                    div.className = 'animate-pulse';
+                    div.className = 'animate-pulse text-sm';
                     div.textContent = s;
                     secretsAside.appendChild(div);
                 });
@@ -830,7 +818,20 @@ const debuggerLog = {
         }
 
         function updateGlitchOverlay() {
-            glitchOverlay.style.setProperty('--int', appState.glitchInt);
+            glitchEffectContainer.style.setProperty('--int', appState.glitchInt);
+            if (appState.effects.glitch) {
+                glitchEffectContainer.classList.add('glitch-active');
+            } else {
+                glitchEffectContainer.classList.remove('glitch-active');
+            }
+        }
+
+        function updateVhsEffects() {
+            if (appState.effects.vhs) {
+                vhsEffectContainer.classList.add('vhs-active');
+            } else {
+                vhsEffectContainer.classList.remove('vhs-active');
+            }
         }
 
         // Loop di animazione (requestAnimationFrame)
@@ -851,15 +852,16 @@ const debuggerLog = {
             soulDecayInterval = setInterval(() => {
                 appState.userSoul += SOUL_DECAY_RATE;
                 updateSoulDisplay();
-                if (Math.random() > 0.65) addSecret(`Glyph-${Math.floor(Math.random() * 999)}`);
+                // Aggiungi segreti meno frequentemente per evitare spam
+                if (Math.random() > 0.9) addSecret(`Glyph-${Math.floor(Math.random() * 999)}`);
             }, 1000);
 
             glitchEffectInterval = setInterval(() => {
-                // Disabilita glitch su schermi più piccoli per performance
-                if (window.innerWidth < 768) { // Punto di interruzione di esempio
+                // Disabilita glitch su schermi più piccoli per performance, o se disabilitato nelle impostazioni
+                if (window.innerWidth < 768 || !appState.effects.glitch) {
                     appState.glitchInt = 0;
                     updateGlitchOverlay();
-                    return; // Salta il resto della logica glitch
+                    return;
                 }
 
                 if (Math.random() > 0.4) {
@@ -878,11 +880,33 @@ const debuggerLog = {
             clearInterval(glitchEffectInterval);
         }
 
+        // Gestione musica
+        let isMusicInitialized = false;
+        function toggleMusic() {
+            if (!isMusicInitialized) {
+                soundcloudPlayer.src = soundcloudPlayer.dataset.src; // Load the music
+                isMusicInitialized = true;
+            }
+
+            if (appState.isMusicPlaying) {
+                // Attempt to pause (SoundCloud API might be needed for full control)
+                // For simplicity, we'll just hide it for now, as direct pause is complex without their API
+                musicPlayerContainer.classList.add('hidden');
+                musicToggleButton.textContent = '🎵';
+                appState.isMusicPlaying = false;
+            } else {
+                musicPlayerContainer.classList.remove('hidden');
+                musicToggleButton.textContent = '🔇'; // Changed to mute icon when playing
+                appState.isMusicPlaying = true;
+            }
+            saveState();
+        }
+
         // Funzione di reset completa dell'applicazione
         function resetApplication() {
             stopIntervals();
             cancelAnimationFrame(rafLoopId);
-            localStorage.removeItem('cosmicHorror');
+            localStorage.removeItem('cosmicHorrorCodexState'); // Usa la nuova chiave
             appState = {
                 page: 'story',
                 segment: 0,
@@ -892,8 +916,20 @@ const debuggerLog = {
                 dimPhase: 0,
                 glitchInt: 0,
                 corruption: 0,
-                secrets: []
+                secrets: [],
+                isMusicPlaying: false,
+                effects: { glitch: true, vhs: true },
+                musicAutoplay: false
             };
+            // Reset UI elements to initial state
+            toggleGlitchCheckbox.checked = true;
+            toggleVhsCheckbox.checked = true;
+            toggleMusicAutoplayCheckbox.checked = false;
+            musicPlayerContainer.classList.add('hidden');
+            soundcloudPlayer.src = ''; // Clear src on full reset
+            isMusicInitialized = false;
+            musicToggleButton.textContent = '🎵';
+
             initApplication(); // Reinizializza l'applicazione
         }
 
@@ -904,41 +940,68 @@ const debuggerLog = {
             if (Array.isArray(appState.visited)) {
                 appState.visited = new Set(appState.visited);
             }
+
+            // Inizializza lo stato dei checkbox delle impostazioni
+            toggleGlitchCheckbox.checked = appState.effects.glitch;
+            toggleVhsCheckbox.checked = appState.effects.vhs;
+            toggleMusicAutoplayCheckbox.checked = appState.musicAutoplay;
+
+            // Applica gli effetti iniziali
+            updateGlitchOverlay();
+            updateVhsEffects();
+
+            // Avvia la musica se l'autoplay è abilitato (e il browser lo permette)
+            if (appState.musicAutoplay) {
+                toggleMusic();
+            }
+
             startIntervals();
             animateLoop(); // Avvia il loop requestAnimationFrame
             renderPage(); // Renderizza la pagina iniziale
             // Imposta il livello di corruzione iniziale in base ai nodi visitati
             const thresholds = [3, 6, 9];
             appState.corruption = thresholds.findIndex(t => appState.visited.size >= t) + 1;
-            updateGlitchOverlay(); // Assicurati che l'overlay glitch sia aggiornato all'avvio
         }
 
-        // Gestione eventi per il modal musicale
+        // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
             initApplication();
 
-            const soundcloudIframe = document.getElementById('soundcloud-player'); // Get iframe by its new ID
-            const soundcloudSrc = soundcloudIframe.dataset.src; // Get the URL from data-src
-
-            musicBtn.addEventListener('click', () => {
-                musicModalOverlay.classList.remove('hidden');
-                if (!soundcloudIframe.src) { // Only set src if it's not already set
-                    soundcloudIframe.src = soundcloudSrc;
+            // Global control buttons
+            musicToggleButton.addEventListener('click', toggleMusic);
+            settingsToggleButton.addEventListener('click', () => {
+                settingsPanel.classList.add('open');
+                settingsPanel.setAttribute('aria-hidden', 'false');
+            });
+            settingsCloseButton.addEventListener('click', () => {
+                settingsPanel.classList.remove('open');
+                settingsPanel.setAttribute('aria-hidden', 'true');
+            });
+            // Close settings panel by clicking outside
+            settingsPanel.addEventListener('click', (event) => {
+                if (event.target === settingsPanel) {
+                    settingsPanel.classList.remove('open');
+                    settingsPanel.setAttribute('aria-hidden', 'true');
                 }
             });
 
-            musicModalCloseBtn.addEventListener('click', () => {
-                musicModalOverlay.classList.add('hidden');
-                // Do NOT clear src here, so music continues playing
+            // Settings checkboxes
+            toggleGlitchCheckbox.addEventListener('change', (event) => {
+                appState.effects.glitch = event.target.checked;
+                updateGlitchOverlay();
+                saveState();
+            });
+            toggleVhsCheckbox.addEventListener('change', (event) => {
+                appState.effects.vhs = event.target.checked;
+                updateVhsEffects();
+                saveState();
+            });
+            toggleMusicAutoplayCheckbox.addEventListener('change', (event) => {
+                appState.musicAutoplay = event.target.checked;
+                saveState();
             });
 
-            // Chiudi il modal cliccando fuori dal contenuto
-            musicModalOverlay.addEventListener('click', (event) => {
-                if (event.target === musicModalOverlay) {
-                    musicModalOverlay.classList.add('hidden');
-                    // Do NOT clear src here, so music continues playing
-                }
-            });
+            resetAppButton.addEventListener('click', resetApplication);
         });
     </script>
 </body>
