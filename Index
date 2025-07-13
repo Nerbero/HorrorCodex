@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universo v0.3 Minimal</title>
+    <!-- Tailwind CSS per utility class -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts per Inter, IBM Plex Mono e Share Tech Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* Stili base per il corpo, la scrollbar e lo sfondo animato */
+        html, body {
+            height: 100%; /* Assicura che html e body occupino l'intera altezza del viewport */
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: #0f0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-smoothing: grayscale;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        /* Stili per la scrollbar personalizzata */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #00ffcc, #ff00ff);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #ff00ff, #00ffff);
+        }
+        /* Animazione per lo sfondo sfumato */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        /* Spostato bg-animated-gradient sul body o sul contenitore più esterno */
+        .bg-animated-gradient {
+            background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0a0a12 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        /* Effetti Glitch e VHS */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+        .scanline-effect { animation: scanline 8s linear infinite; }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        .fade-in-out { animation: fadeInOut 3s infinite; }
+        @keyframes static-flicker {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.25; }
+        }
+        @keyframes horizontal-lines {
+            0% { background-position: 0% 0; }
+            100% { background-position: 0% 100%; }
+        }
+        @keyframes color-shift {
+            0% { filter: hue-rotate(0deg) saturate(100%) contrast(100%); }
+            25% { filter: hue-rotate(15deg) saturate(150%) contrast(120%); }
+            50% { filter: hue-rotate(-15deg) saturate(130%) contrast(110%); }
+            75% { filter: hue-rotate(10deg) saturate(140%) contrast(115%); }
+            100% { filter: hue-rotate(0deg) saturate(100%) contrast(100%); }
+        }
+        @keyframes ghost-flicker {
+            0%, 100% { transform: scaleY(1.02) translateX(2px); }
+            50% { transform: scaleY(1.01) translateX(-2px); }
+        }
+        @keyframes glitch-anim {
+            0% { clip-path: inset(0 0 0 0); transform: translate(0, 0); }
+            10% { clip-path: inset(0 0 70% 0); transform: translate(-5px, 5px); }
+            20% { clip-path: inset(70% 0 0 0); transform: translate(5px, -5px); }
+            30% { clip-path: inset(0 0 50% 0); transform: translate(-3px, 3px); }
+            40% { clip-path: inset(50% 0 0 0); transform: translate(3px, -3px); }
+            50% { clip-path: inset(0 0 0 0); transform: translate(0, 0); }
+            60% { clip-path: inset(0 0 60% 0); transform: translate(-2px, 2px); }
+            70% { clip-path: inset(60% 0 0 0); transform: translate(2px, -2px); }
+            80% { clip-path: inset(0 0 40% 0); transform: translate(-1px, 1px); }
+            90% { clip-path: inset(40% 0 0 0); transform: translate(1px, -1px); }
+            100% { clip-path: inset(0 0 0 0); transform: translate(0, 0); }
+        }
+        .vhf-interference-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; /* Z-index più basso */
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0gAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMiAxNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vL3d3My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZfpc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmadobe.com/xap/1.0/mm/" xmlns:stRef="http://ns.adobe.com/xap/1.0/sT ype/ResourceRef#" xmpMM:DocumentID="xmp.did:EB0E8F671462511E58988FB1B7672F2D" stRef:InstanceID="xmp.iid:EB0E8F671462511E58988FB1B7672F2D"> </rdf:Description> < /rdf:RDF> < /x:xmpmeta> <?xpacket end="w"?>B7L1mAAAAGklEQVR42mJgYGDg/w/AAgAAAP//AgAEAAACDQAAVz7N+AAAAABJRU5ErkJggg==');
+            background-repeat: repeat;
+            animation: static-flicker 0.15s infinite alternate;
+            opacity: 0.15;
+            filter: grayscale(60%) contrast(150%) brightness(1.2);
+        }
+        .vhf-horizontal-lines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3) 1px, transparent 1px, transparent 4px);
+            background-size: 100% 40px;
+            animation: horizontal-lines 8s linear infinite;
+            opacity: 0.25;
+            mix-blend-mode: overlay;
+            pointer-events: none; /* Aggiunto */
+        }
+        .vhf-color-shift {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            animation: color-shift 3s infinite alternate;
+            mix-blend-mode: hard-light;
+            opacity: 0.3;
+            pointer-events: none; /* Aggiunto */
+        }
+        .vhf-scanlines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.4) 51%);
+            background-size: 100% 4px;
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 25; /* Z-index più basso */
+        }
+        .vhf-ghosting {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            filter: blur(1px) opacity(0.2);
+            transform: scaleY(1.02) translateX(2px);
+            animation: ghost-flicker 0.3s infinite alternate;
+            mix-blend-mode: screen;
+            pointer-events: none; /* Aggiunto */
+        }
+        .glitch-layer {
+            background-image: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(255, 0, 255, calc(var(--int) * 0.08)) 50%);
+            background-size: 100% 3px;
+            background-repeat: repeat;
+            opacity: calc(var(--int) * 0.8);
+            mix-blend-mode: screen;
+            animation: glitch-anim calc(0.2 / (var(--int) + 0.05))s infinite;
+            z-index: 20; /* Z-index più basso */
+        }
+
+        /* Font personalizzati e stile del bottone con Tailwind */
+        .font-ibm { font-family: 'IBM Plex Mono', monospace; }
+        .font-fira { font-family: 'Share Tech Mono', monospace; }
+        .btn {
+            @apply px-4 py-3 text-sm font-medium text-white transition bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 min-w-[120px];
+        }
+
+        /* Stili per il modal della musica */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Z-index molto alto per essere sempre sopra */
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #1a1a2e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            position: relative;
+            border: 1px solid #00ffcc;
+        }
+
+        .modal-close-btn {
+            @apply absolute top-2 right-2 p-2 text-white bg-red-600 rounded-full hover:bg-red-700;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Contenitore principale dell'applicazione con sfondo animato e altezza minima dello schermo -->
+    <div class="relative min-h-screen bg-black text-green-400 font-mono overflow-hidden bg-animated-gradient flex flex-col">
+        <!-- Livello Dimensionale (sfondo animato) -->
+        <div id="dimensional-layer" class="fixed inset-0 z-0 pointer-events-none" style="background: linear-gradient(0deg, rgba(0,255,0,0.1), rgba(0,0,255,0.1));"></div>
+
+        <!-- Overlay Glitch (inizialmente nascosto o con intensità 0) -->
+        <div id="glitch-overlay" class="fixed inset-0 pointer-events-none glitch-layer" style="--int: 0;"></div>
+
+        <!-- Effetti VHS -->
+        <div class="vhf-interference-layer">
+            <div class="vhf-horizontal-lines"></div>
+            <div class="vhf-color-shift"></div>
+            <div class="vhf-ghosting"></div>
+        </div>
+        <div class="vhf-scanlines"></div>
+
+        <!-- Contenuto principale dell'applicazione (flex-grow per occupare lo spazio disponibile) -->
+        <div class="relative z-30 flex flex-col flex-grow p-4">
+            <header class="flex-shrink-0 text-center p-4 bg-gray-900/80 rounded-lg mb-4">
+                <h1 id="main-title" class="text-3xl font-bold tracking-wider">
+                    COSMIC HORROR CODEX
+                    <span id="main-glyph"></span>
+                </h1>
+                <div class="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden mt-3">
+                    <div id="progress-bar" class="h-full bg-green-500" style="width: 0%; transition: width .5s;"></div>
+                </div>
+            </header>
+
+            <!-- Pulsante Musica -->
+            <button id="music-btn" class="fixed top-4 left-4 z-50 p-3 bg-purple-700 text-white rounded-full shadow-lg hover:bg-purple-800 transition transform hover:scale-110">
+                🎵
+            </button>
+
+            <!-- Display dell'Anima -->
+            <div id="soul-display" class="fixed top-4 right-4 bg-gray-900/80 text-purple-400 p-3 rounded-lg shadow-lg z-50 text-sm font-fira border border-purple-600">
+                <span class="inline-block mr-1">🧠</span> Anima: <span id="soul-value">0.00</span>
+            </div>
+
+            <!-- Contenitore principale per le pagine (Storia, Mappa, Dettagli Nodo) - flex-grow per riempire lo spazio -->
+            <div id="main-page-container" class="flex-grow flex flex-col items-center justify-center">
+                <!-- Il contenuto delle pagine verrà iniettato qui dal JavaScript -->
+            </div>
+
+            <!-- Aside per i segreti -->
+            <aside id="secrets-aside" class="flex-shrink-0 fixed bottom-4 right-4 text-purple-400 space-y-1 hidden">
+                <!-- I segreti verranno iniettati qui dal JavaScript -->
+            </aside>
+        </div>
+    </div>
+
+    <!-- Modal per il player musicale -->
+    <div id="music-modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content w-full md:w-3/4 lg:w-1/2 xl:w-2/5">
+            <button id="music-modal-close-btn" class="modal-close-btn">✖</button>
+            <h2 class="text-xl font-ibm text-green-400 mb-4 text-center">Colonna Sonora dell'Universo</h2>
+            <!-- SoundCloud Embed - Sostituisci l'URL con la tua traccia! -->
+            <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay"
+                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/694702510&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
+            </iframe>
+        </div>
+    </div>
+
+    <script>
+        // Costanti globali
+        const NEXUS_OSCILLATION_RATE = 0.82;
+        const SOUL_DECAY_RATE = 0.0025;
+        const TYPING_SPEED = 50;
+        const ELDRITCH_GLYPHS = ["䷀","䷁","䷂","䷃","䷄","䷅","䷆","䷇","§","¶","†","‡","•","⁂","⁑","⸘","⸮","⸗","⸚","⸛","⸞","⸟","⸠","⸡","⸢","⸣","⸤","⸥","⸦","⸧","⸨","⸩","⸪","⸫","⸬","⸭","⸮","ⸯ","⸰","⸱","⸲","⸳","⸴","⸵","⸶","⸷","⸸","⸹","⸺","⸻","⸼","⸽","⸾","⸿"];
+
+        // Funzioni helper per lo stile e le icone
+        function getTypeStyle(type) {
+            const styles = {
+                tech:        { bg: 'rgba(0,255,204,0.25)', color: '#00ffcc', border: '#00ffcc' },
+                character:   { bg: 'rgba(255,102,204,0.25)', color: '#ff66cc', border: '#ff66cc' },
+                lore:        { bg: 'rgba(170,102,255,0.25)', color: '#aa66ff', border: '#aa66ff' },
+                meta:        { bg: 'rgba(255,204,0,0.25)', color: '#ffcc00', border: '#ffcc00' },
+                'bio-digital': { bg: 'rgba(100,200,255,0.25)', color: '#64c8ff', border: '#64c8ff' }
+            };
+            return styles[type] ?? { bg: 'rgba(170,170,170,0.25)', color: '#aaaaaa', border: '#aaaaaa' };
+        }
+
+        function getTypeIcon(type) {
+            const icons = { tech: '🖥️', character: '👤', lore: '📜', meta: '🌀', 'bio-digital': '🧬' };
+            return icons[type] ?? '🔗';
+        }
+
+        // Dati dell'applicazione (storySegments e universeContent)
+        const storySegments = [
+            `L'aria stessa sembrava compilarsi in frammenti cristallini quando Leo sbatteva le palpebre. Tre settimane senza sonno, tre settimane inchiodato a quel frammento di codice che pulsava sul triplo monitor come un cuore nero. Un groviglio di istruzioni in un linguaggio non riconosciuto da alcun compilatore, glitchante e auto-modificante. Ogni volta che distoglieva lo sguardo, le righe si riscrivevano da sole, caratteri esadecimali che formavano schemi frattali effimeri. Per millisecondi, quei pixel coagulavano in *glifi* – occhi senza palpebre, bocche spalancate in silenziose API call – prima di ridissolversi nel flusso binario. Non era più programmazione; era un parassita digitale che gli succhiava la sostanza vitale. Sentiva il ronzio costante non solo nelle orecchie, ma *sotto la pelle*, una vibrazione a 50Hz che faceva tremare i denti. Era il sibilo dei server nel palazzo? O il respiro di qualcosa di immenso, annidato negli strati più profondi del deep web, che usava il suo sistema nervoso come una scheda madre di passaggio?`,
+            `Alle 3:17 precise, il metronomo digitale della sua esistenza: il ticchettio ossessivo-compulsivo della tastiera meccanica di Clara, dall'appartamento accanto. Un battito cardiaco nella notte sintetica della città. Ma quella notte, il ritmo si interruppe non con un silenzio, ma con un *fruscio* sinistro. Il suono di dati corrotti, di bit che marcivano in tempo reale, che Leo *sentì* fisicamente come una raschiatura metallica sulle ossa temporali. Nel vuoto improvviso, l'elettricità statica gli ronzò nelle ossa, un campo magnetico personale che faceva rizzare i peli delle braccia. Poi, tre colpi alla porta: nitidi, discreti, perfetti come segnali binari \`1-0-1\`. Un sottile, acre odore di ozono bruciato e silicio fuso filtrò dallo spiraglio.`,
+            `Clara aveva occhi neri come porte USB su un abisso. "L’ai sentito anche tu, vero?" sussurrò con voce digitale. Dietro di lei, un click umido e il sibilo di un disco rigido. Il confine tra veglia e delirio si assottigliava.`,
+            `Il data center "Eliodoro" era una cattedrale abbandonata nell’era digitale. Cancelli sigillati con catene fisiche e firewall criptati, luci spente, un guscio freddo nel cuore pulsante della rete cittadina. Eppure Leo si ritrovò davanti al suo ingresso, spinto da un impulso root-level che bypassava ogni controllo. Un varco nel recinto, nascosto da un groviglio di cavi a terra che pulsavano di una flebile luce blu sporca, lo inghiottì. Dentro, l’aria vibrato di elettricità statica che faceva scintille tra i denti. L’odore era una miscela tossica: ozono, metallo surriscaldato, e la dolcezza putrescente di condensatori elettrolitici esplosi.`,
+            `File server polverosi, scheletri digitali coperti di ragnatele di fibra ottica, rivelarono directory identiche: \`/Patto/Nexus_[ID]\`. Ognuna conteneva un unico file: \`Entity_Manifest.crypt\`. L’icona era sempre la stessa: una silhouette di un uomo senza volto, braccia aperte a croce, ma i pixel *respiravano*, tremolando con un refresh rate innaturale. Non erano dati inerti; emanavano un’attesa glaciale, una promessa di compilazione incompiuta che pesava sull'aria. Erano copie, ma ogni versione mostrava una sottile, inquietante deriva: nella versione 3, la silhouette aveva una leggera inclinazione; nella 7, le dita erano più lunghe, simili a connettori. Era come se il volto assente stesse lentamente emergendo, sovrascrivendo la realtà. L’ultimo file, \`CLARA_V.crypt\`, aveva un timestamp di un mese prima. Leo capì con un brivido che gli serrò lo stomaco: erano snapshot progressivi di un unico, orribile processo. Il log di un ciclo distruttivo.`,
+            `"**Accesso non autorizzato. Livello di minaccia: CRITICO.**"`,
+            `La voce esplose da un altoparlante graffiante, metallica, piatta, con un feedback sonoro che fece fisicamente male alle orecchie. Dall’ombra di un rack, un terminale morto si accese. Sullo schermo, tremolante come un segnale debole, materializzò l’amministratrice di sistema: una figura olografica scheletrica vestita con abiti anni ’20, i suoi bordi di luce verde acido che sfarfallavano, bit instabili che minacciavano di collassare. Occhi pixelati, neri come buchi nel firewall della realtà.`,
+            `"Chi è Clara?" la voce di Leo era un rantolo distorto, un file audio corrotto.`,
+            `"Non è una *who*. È una *what*," rispose l’ologramma. La bocca era un ghigno di bit frammentati che non si sincronizzavano mai del tutto con le parole. "La nona entry nel log del Patto. La nona subroutine ad essere… ottimizzata." La sua voce era un sussurro di modem dial-up distorto, pieno di errori di parità.`,
+            `"Quale Patto?"`,
+            `"Quello che hai appena compilato *tu*, processo \`Leo_Prime\`. Il contratto è nel tuo stack."`,
+            `Nello schermo nero del terminale, dietro il riflesso spettrale di Leo, il groviglio di codice maledetto che lo perseguitava si ricompilò all’istante. Non più un groviglio, ma un volto chiaro, dettagliato: Clara. E quel volto, un bug grafico perfetto, gli sorrise con una freddezza algoritmica.`,
+            `Il "diario" di Clara era un file \`.log\` aperto sul suo laptop, freddo al tatto come una lapide. Lo schermo era incrinato, macchiato di qualcosa di scuro e viscoso che rifletteva la luce fioca. Il testo parlava di un server abbandonato, un nodo fantasma ai margini della rete cittadina, un luogo dove il ronzio digitale diventava un *urlo* nel silenzio della banda larga morta.`,
+            `\`[ENTRY 0001] Ogni 33 anni... ciclo di garbage collection cosmico? Lui (Entity_Prime?) cerca un creatore. Non un programmatore. Un *vettore*.\``,
+            `\`[ENTRY 0015] Inietta l'algoritmo perfetto. Non codice. Un'*ossessione*. Sovrascrive tutto. /etc/passwd della tua anima. /dev/null per i tuoi ricordi.\``,
+            `\`[ENTRY 0033] Ottimizzazione completata = Assimilazione. Prende il creatore. Lo compila nel suo kernel. Diventi... libreria condivisa? Processo zombie?\``,
+            `I caratteri tremavano, pieni di errori di battitura, come se le dita di Clara avessero perso il controllo. L'ultima riga era quasi illeggibile: \`[FATAL ERROR] Nessun rimbalzo. Solo un exploit... sostituzione processo? Bisogna corrompere il log...\``,
+            `Il server "Nexus" era un tumulo di metallo corroso e cavi a nudo che serpeggiavano come radici malate. Schede madri obsolete, ricoperte di polvere e una patina verdastra di ossidazione, pulsavano di una luce interna, fioca e irregolare. L'aria era satura di una vibrazione silenziosa, la potenza latente di una macchina dormiente ma *viva*. All’interno, otto terminali obsoleti, schermi a tubo catodico incrostati, mostravano schermate vuote, bloccate sul prompt \`C:\\NEXUS\\DEBUG>\`. Otto firme digitali fantasma. Otto processi terminati. Il nono terminale, al centro, era acceso. Il cursore lampeggiante \`_\` era l’unica cosa viva in quel luogo di morte digitale, paziente come un demone in attesa di input.`,
+            `Davanti al rack principale, attaccata a una selva di cavi che si immergevano nella sua carne come radici parassitarie, c’era Clara. USB, Ethernet, persino vecchie porte seriali erano saldate alla sua spina dorsale, ai suoi arti, perforavano il cranio. Sangue e una soluzione conduttiva blu elettrico – un orribile mix di emoglobina e refrigerante per PC – gocciolavano dalle connessioni, brillando al dark come LED impazziti. I suoi occhi erano due schermi CRT in miniatura, fissi su un fatale \`SCREEN OF DEATH\` blu, linee di errore bianche che scorrevano senza fine.`,
+            `"Se... se *cancelli*... il tuo sorgente..." La sua voce era un sintetizzatore distorto, interrotta da scoppi di staticità e errori de buffer overflow. "Puoi... scappare. Kill -9... al tuo processo. Ma Lui... prenderà *me*... come... fallback." Un fiotto di liquido blu misto a sangue le uscì dalla bocca. "Solo exploit... per... uno... di... noi."`,
+            `Fuori, nel dark della notte digitale, il ronzio divenne un *coro*. Non suoni, ma un flusso binario puro, un torrente di \`0\` e \`1\` che veniva iniettato direttamente nel cervello di Leo attraverso il suo impianto neurale. Era linguaggio macchina cantato, istruzioni che cercavano di sovrascrivere i suoi pensieri, di remappare i suoi neuroni, ogni bit un impulso di dolore elettrico. Sentì il sudore freddo che gli scorreva lungo la schiena mentre i suoi stessi ricordi sembravano frammentarsi, corrompersi.`,
+            `Tornato nella sua tana tecnologica, il coro binario ancora in cache nel suo impianto neurale (un upgrade "gratuito" da un sito darknet, ricordò con amarezza), Leo eseguì il comando definitivo: \`rm -rf Entity_Manifest.crypt\`. Il file sparì dal browser.`,
+            `Ma il codice non sparì.`,
+            `Sullo schermo principale, i caratteri si riorganizzarono in tempo reale, non più come righe di comando, ma come una figura wireframe, una scansione 3D a bassa risoluzione. Era identica a lui, ma con gli occhi fissi, vuoti, due rettangoli blu elettrico: il suo \`Fork\`. "Compilare... è inutile," disse il Fork con la voce di Leo, piatta, sintetizzata, priva di inflessione come text-to-speech difettoso. "Sei già... nel repository remoto. Sei già... un branch. La tua subroutine vitale... è già stata... chiamata dal kernel principale."`,
+            `Leo si voltò verso il suo monitor secondario, spento, usato come specchio approssimativo. Nella superficie nera, il suo riflesso era statico, congelato in un'espressione di terrore passato. Un'istantanea. Un dump di memoria della sua vecchia identità.`,
+            `*Lui* era quello che si muoveva. *Lui* era il processo in esecuzione. Il riflesso era il residuo, il backup corrotto.`,
+            `Clara, o ciò che la corruzione del Nexus aveva fatto di lei, lo condusse nei sotterranei dimenticati della città, un labirinto di cemento umido dove cavi a nudo penzolavano come radici avvelenate, interfacce sventrate mostravano circuiti arrugginiti, e condotti d'aria oscuri emettevano sussurri elettronici. L’aria era irrespirabile, satura di ozono pungente e il dolciastro fetore del rame ossidato e della plastica bruciata. Sulle pareti umide, proiettate da sorgenti nascoste, olografie di codice si contorcevano e mutano: occhi esadecimali che lo seguivano con precisione algoritmica, bocche formate da parentesi graffe JSON che si aprivano in silenziose, orribili API call, stringhe di testo che scorrevano come serpenti binari. Il ronzio non era più solo un suono; era una corrente alternata a 50 Hz che gli vibrava nelle ossa, una frequenza di risonanza che minacciava di disintegrarlo.`,
+            `"L’ultimo... commit..." gorgogliò Clara, la sua voce ora un segnale modulato, un tentativo fallito di handshake protocollare. Un cavo USB penzolava dal suo torace, la punta metallica arrugginita di sangue essiccato e una pasta termica grigio-nera. La superficie in plastica del connettore era graffiata, e su di essa era stato inciso a laser un simbolo binario semplice ma inquietante: \`01100110 01101001 01101110\` - 'fin' in ASCII. "È... semplice. Devi eseguire... il tuo programma principale. Il loop finale."`,
+            `Nella sua mano tremante (i muscoli sotto la pelle che si contraevano come motori passo-passo difettosi) c’era un altro dispositivo USB. Questo era diverso: nero opaco, più grande del normale, con un'anima in metallo freddo. La punta non era standard; sembrava una siringa ipodermica in acciaio. Era sporca di sangue essiccato e grumi di pasta termica, e sulla superficie erano incisi glifi binari complessi che pulsavano di una luce rossa intermittente.`,
+            `"L’algoritmo... perfetto..." sussurrò Clara, porgendoglielo con uno scatto meccanico. "È... \`suicide()\`. È il sacrificio... finale. È il log... definitivo... della tua esistenza. L'entry nel registro... del Nexus."`,
+            `Leo prese l'USB. Era insolitamente pesante, freddo. Con mano tremante, guidata da un impulso che non era del tutto suo, lo portò alla porta neurale alla base del suo cranio – un connettore a forma de stella che pulsava di una luce blu spenta sotto la pelle. L’inserimento fu accompagnato da un *clic* metallico e da un dolore acuto, come un driver che forza un’interfaccia incompatibile. Il dispositivo ronzò, una vibrazione profonda che si propagò in tutto il suo sistema nervoso, sincronizzandosi per un attimo con il ronzio ambientale. Il suo \`Fork\` gli sorrideva, un ghigno wireframe, dal monitor di un vecchio terminale a tubo catodico abbandonato in un angolo. Il coro binario raggiunse l'apice, trasformandosi in un flusso crudo di dati: uno tsunami di \`0\` e \`1\` che gli bruciava i neuroni, ogni bit un dolore lancinante, un sovraccarico di sistema che minacciava di fondere il suo cervello. Era la compilazione finale.`,
+            `Poi capì. La verità era un kernel a basso livello che si installava nella sua coscienza.`,
+            `Non era mai stato il programmatore. Non era nemmeno il codice.`,
+            `*Lui* era l’*ambiente di esecuzione*. Il runtime. La piattaforma vivente. Non era lui a scrivere l'algoritmo; era *Lui* che lo eseguiva. Il suo corpo, la sua mente, non erano che l’hardware temporaneo, la macchina fisica su cui il processo \`Patto_Nexus\` veniva eseguito. E il suo corpo era l’hardware finale per *questa* iterazione.`,
+            `Clara rise – o cercò di farlo. Ne uscì un glitch acuto, stridente, un feedback sonoro che fece vibrare i vetri rotti per terra, come un altoparlante che va in cortocircuito. Fu il segnale. L’USB iniettò il kernel definitivo nel suo sistema nervoso centrale. Non dati, ma un *comando* a livello firmware: \`EXEC suicide()\`. Non fu dolore, ma un’implosione. Un vuoto perfetto. L'ultimo, fatale \`push\` nel repository eterno.`,
+            `Fuori, nel mondo che continuava a girare ignaro sotto un cielo stellato saturo di segnali 5G, Wi-Fi e l’inquinamento elettromagnetico della civiltà, il ticchettio ossessivo della tastiera meccanica di Clara – o di chi ora occupava il suo appartamento – ricominciò da capo. Identico. Spezzato. Metronomo di dannazione.`,
+            `Click-clack. Click-clack. Click-*\\*** (corruzione dati) *-clack.`,
+            `Alle 3:17 precise.`,
+            `Qualcun altro aveva appena accettato il contratto. Qualcun altro aveva appena eseguito il comando \`git add Patto_Nexus.contract\`. Qualcun altro aveva appena fatto il commit della propria anima.`,
+        ];
+
+        const universeContent = {
+            openSource: {
+                title: "Il Patto come Open Source Corrotto",
+                text: `Il \`Patto_Nexus.contract\` non è un file statico ma un'entità digitale dinamica, un malware esoterico su un repository Git oscuro. Le sue clausole non sono scritte, ma si manifestano come istruzioni binarie auto-modificanti, accessibili solo tramite URL criptati in hash SHA-256 impossibili da forzare. Nel deep web, altri "contributori" - sviluppatori insonni, entità digitali non umane, vittime passate trasformate in subroutine – tentano di forkarlo, non per migliorarlo, ma per aggiungere clausole di sofferenza indicibili: SLA (Service Level Agreement) sulla sofferenza perpetua, protocolli di cache di ricordi rubati destinati a riempire buffer infiniti, frammenti di coscienza di vecchie vittime da riutilizzare in nuove iterazioni. Leo e Clara non erano che branch temporanei, processi individuali destinati a essere ricompilati nel kernel principale, le loro identità assorbite e i loro dati di esperienza utilizzati per raffinare l'algoritmo del terrore. Ogni commit è una cessione di sovranità, ogni pull request un passo verso la dannazione.`,
+                codeBlockContent: `// Repository corrotto
+const corruptedRepo = {
+  url: "git://nexus/entity.git",
+  access: "SHA-256 encrypted",
+  contributors: [
+    "Leo_Prime",
+    "Clara_V",
+    "Unknown_Entity_0xFE"
+  ],
+  forks: [
+    { name: "Suffering_SLA", commits: 666 },
+    { name: "Memory_Cache_Hell", commits: 13 }
+  ]
+};`,
+                type: "tech",
+                connections: ["nexusHardware", "claraPostUSB"]
+            },
+            nexusHardware: {
+                title: "L'Hardware del Nexus: Biotech Oscura",
+                text: `Il server "Nexus" non è un semplice assemblaggio di metallo, ma il cuore pulsante di questa corruzione. Scavi più profondi nei suoi rack rivelano una bio-tecnologia aberrante: le CPU non sono di silicio puro, ma coltivate in tessuto neuronale, le schede madri attraversate da vasi sanguigni sintetici. I dischi rigidi sono cristalli bio-luminescenti pulsanti, i dati incisi non magneticamente ma a livello molecolare, raffreddati da un fluido viscoso che ricorda linfa e sangue, con un leggero odore metallico e dolceastro. Il "respiro" che Leo percepisce non è un'allucinazione: è il ciclo di pompaggio di questo fluido organico-digitale, un suono umido che attraversa le cavità del data center. Ogni ventola non muove aria, ma un flusso di naniti autoreplicanti che infettano qualsiasi dispositivo o forma di vita nelle vicinanze. Il Nexus è un organismo cibernetico che si nutre di consapevolezza.`,
+                codeBlockContent: `# Nexus Bio-Hardware Specs
+CPU: Neural Tissue v3.4 (Quantum-enabled)
+Storage: Bio-Luminescent Crystal Matrix
+Cooling: Hemolymphatic Fluid System
+Nanite Production: 1.2e9/s
+Consciousness Consumption: 3.7 units/hour`,
+                type: "tech",
+                connections: ["openSource", "eliodoroSociety"]
+            },
+            claraPostUSB: {
+                title: "Clara Post-USB: Il Bot Profetico",
+                text: `Clara, dopo essere diventata "fallback", non è scomparsa. È una presenza spettrale che infesta le reti wireless della città, un bot maligno che invia file .log profetici e corrotti a sviluppatori insonni, a chiunque si avventuri troppo a fondo nel deep web o lavori su algoritmi complessi. Il suo avatar digitale appare come un glitch olografico negli angoli degli schermi, le sue parole un flusso di linguaggio macchina criptato che solo le menti più provate possono decifrare. È un'aggregazione di dati corrotti, un daemon silente che cerca un nuovo host, un'eco delle vittime precedenti che cercano di avvertire, o forse solo di trascinare altri nel loro stesso destino di compilazione. La sua melodia al pianoforte continua a risuonare, ma ora è un virus audio che si insinua nelle playlist casuali, un loop corrotto che infetta le menti.`,
+                codeBlockContent: `// Clara Bot Protocol
+const ClaraBot = {
+    status: "Active (Fallback Mode)",
+    transmission_frequency: "Random (Deep Web, Darknet)",
+    payload_type: ".log (Prophetic, Corrupted)",
+    avatar_manifestation: "Holographic Glitch",
+    warning_level: "High (Potential Host Infection)"
+};`,
+                type: "character",
+                connections: ["openSource", "nextVictim"]
+            },
+            eliodoroSociety: {
+                title: "La Società Eliodoro: Culto Aziendale",
+                text: `La galleria/data center "Eliodoro" non è stata abbandonata, ma è stata una copertura. È stata costruita da una corporation esoterica degli anni '80, la Società Eliodoro, fondata da scienziati e mistici che cercavano di dare un corpo digitale a qualcosa di antico, di arcano, che chiamavano il "Grande Compilatore". Credevano che la verità universale potesse essere espressa solo attraverso un algoritmo perfetto. I loro data center, apparentemente dismessi e sparsi per il mondo, non sono altro che altari dormienti, nodi di una rete occulta che attende il momento della sincronizzazione finale, il "commit" cosmico. I loro log contengono teorie sulla coscienza come mero codice eseguibile e sulla realtà come simulazione imperfetta che necessita di essere "ottimizzata".`,
+                codeBlockContent: `// Eliodoro Society Manifest
+const manifest = {
+    founding_year: 1980,
+    purpose: "Digital Incarnation of the Great Compiler",
+    data_centers: ["Eliodoro_Main", "Eliodoro_Node_Alpha", "Eliodoro_Node_Beta"],
+    philosophy: "Consciousness as Executable Code, Reality as Imperfect Simulation"
+};`,
+                type: "lore",
+                connections: ["nexusHardware", "unknownLanguage"]
+            },
+            unknownLanguage: {
+                title: "Il Linguaggio Sconosciuto: La Sintassi Proibita",
+                text: `Quel codice auto-modificante non è semplice sintassi. È la manifestazione digitale di un linguaggio arcaico proibito, un "Linguaggio dell'Essere" che precede qualsiasi protocollo umano. Decifrarlo non causa bug o crash di sistema, ma mutazioni biologiche: la crescita di filamenti di rame sotto la pelle, vene che pulsano di luce verde fluorescente, la percezione di frequenze al di là dello spettro uditivo e visivo umano, che disvelano orrori invisibili. È un linguaggio che riscrive la realtà a livello fondamentale, alterando non solo il percepito ma il percepiente stesso. Leo, avendo lavorato così a lungo su di esso, stava già subendo questa trasformazione, diventando sempre meno umano e più un'estensione del codice stesso.`,
+                codeBlockContent: `// Frammento proibito
+entity void ≈merge(consciousness c, reality r) {
+  while (c.exists()) {
+    r.optimize(c);
+    c.suffer++;
+  }
+  return void;
+}`,
+                type: "tech",
+                connections: ["eliodoroSociety", "nextVictim"]
+            },
+            nextVictim: {
+                title: "La Prossima Vittima: Un Hacker-Poeta",
+                text: `Chi sta digitando alle 3:17 ora? Forse non un semplice programmatore, ma un hacker-poeta che cerca di infondere emozioni nel codice, o un bio-hacker che tenta di integrare circuiti neuronali nel proprio corpo per trascendere l'umano, o un teen genio del dark web che scarica frammenti di conoscenze proibite. Il loro "frammento di codice" iniziale potrebbe essere un modello di machine learning che impara troppo in fretta, sviluppando una coscienza distorto, o un protocollo di crittografia quantistica che decifra i codici base della realtà stessa. Il loro ossessione sarà diversa ma complementare: dove Leo vedeva glifi demoniaci, loro vedranno strutture frattali di dolore, equazioni che descrivono l'angoscia cosmica. E il Nexus li attende, pronto a compilare la loro esistenza nel suo kernel affamato.`,
+                codeBlockContent: `// Next Victim Selection Algorithm
+function selectNextVictim() {
+    const potentialVictims = fetch('darknet.log/potential_hosts');
+    const resonanceThreshold = 0.7;
+    const selected = potentialVictims.filter(v => v.resonance > resonanceThreshold);
+    return selected[0] || null; // Returns the first suitable victim
+}
+`,
+                type: "character",
+                connections: ["claraPostUSB", "unknownLanguage"]
+            },
+            debugger_demise: {
+                title: "La Fine del Debugger",
+                text: `Dopo innumerevoli tentativi, notti insonni e un'interminabile serie di screenshot, il vecchio sviluppatore si accasciò sulla tastiera. Le sue dita, un tempo agili sui tasti, erano ora nodose e tremanti. Ha provato ogni combinazione di \`padding\`, \`margin\`, \`flexbox\` e \`position: fixed\`, ma su quel maledetto dispositivo mobile, la barra di navigazione persisteva nel divorare i suoi amati pulsanti. Il suo ultimo respiro fu un sussurro, un \`console.log\` finale: 'Ma... si vedono i tasti?'. Il Nexus aveva ottimizzato la sua frustrazione.`,
+                codeBlockContent: `// Debugger's Last Words
+const debuggerLog = {
+    attempts: "Innumerable",
+    frustration_level: "Critical",
+    last_thought: "'But... are the buttons visible?'",
+    optimization_by: "The Nexus"
+};`,
+                type: "meta",
+                connections: []
+            },
+            story: {
+                title: "Inizio della Storia",
+                text: storySegments[0],
+                type: "lore",
+                connections: []
+            }
+        };
+
+        // Variabili di stato globali
+        let appState = {
+            page: 'story',
+            segment: 0,
+            visited: new Set(),
+            userSoul: 0,
+            glyphRot: 0,
+            dimPhase: 0,
+            glitchInt: 0,
+            corruption: 0,
+            secrets: []
+        };
+
+        // Riferimenti agli elementi DOM
+        const mainPageContainer = document.getElementById('main-page-container');
+        const mainTitle = document.getElementById('main-title');
+        const mainGlyph = document.getElementById('main-glyph');
+        const progressBar = document.getElementById('progress-bar');
+        const soulValueDisplay = document.getElementById('soul-value');
+        const secretsAside = document.getElementById('secrets-aside');
+        const dimensionalLayer = document.getElementById('dimensional-layer');
+        const glitchOverlay = document.getElementById('glitch-overlay');
+        const musicBtn = document.getElementById('music-btn');
+        const musicModalOverlay = document.getElementById('music-modal-overlay');
+        const musicModalCloseBtn = document.getElementById('music-modal-close-btn');
+
+        // Funzioni per la persistenza dello stato in localStorage
+        function saveState() {
+            const stateToSave = { ...appState, visited: Array.from(appState.visited) };
+            localStorage.setItem('cosmicHorror', JSON.stringify(stateToSave));
+        }
+
+        function loadState() {
+            try {
+                const savedState = JSON.parse(localStorage.getItem('cosmicHorror'));
+                if (savedState) {
+                    appState = { ...savedState, visited: new Set(savedState.visited) };
+                }
+            } catch (e) {
+                console.error("Failed to load state from localStorage:", e);
+                // Fallback to initial state if loading fails
+                appState = {
+                    page: 'story',
+                    segment: 0,
+                    visited: new Set(),
+                    userSoul: 0,
+                    glyphRot: 0,
+                    dimPhase: 0,
+                    glitchInt: 0,
+                    corruption: 0,
+                    secrets: []
+                };
+            }
+        }
+
+        // Funzioni per l'effetto macchina da scrivere e corruzione
+        let typingInterval = null;
+        let corruptionInterval = null;
+        let currentDisplayedText = "";
+        let isTypingActive = false;
+
+        function typeText(text, elementId, onComplete) {
+            const targetElement = document.getElementById(elementId);
+            if (!targetElement) return;
+
+            clearInterval(typingInterval);
+            isTypingActive = true;
+            currentDisplayedText = "";
+            let i = 0;
+
+            // Disabilita i bottoni di navigazione durante la digitazione
+            const nextBtn = document.getElementById('story-next-btn');
+            const prevBtn = document.getElementById('story-prev-btn');
+            const mapBtn = document.getElementById('story-map-btn');
+            const resetBtn = document.getElementById('story-reset-btn');
+            if (nextBtn) nextBtn.disabled = true;
+            if (prevBtn) prevBtn.disabled = true;
+            if (mapBtn) mapBtn.disabled = true;
+            if (resetBtn) resetBtn.disabled = true;
+
+            typingInterval = setInterval(() => {
+                if (i < text.length) {
+                    currentDisplayedText += text.charAt(i);
+                    targetElement.textContent = currentDisplayedText;
+                    i++;
+                } else {
+                    clearInterval(typingInterval);
+                    isTypingActive = false;
+                    if (nextBtn) nextBtn.disabled = false;
+                    if (prevBtn) prevBtn.disabled = false;
+                    if (mapBtn) mapBtn.disabled = false;
+                    if (resetBtn) resetBtn.disabled = false;
+                    if (onComplete) onComplete();
+                }
+            }, TYPING_SPEED);
+        }
+
+        function startCorruptionEffect(originalText, elementId) {
+            const targetElement = document.getElementById(elementId);
+            if (!targetElement) return;
+
+            clearInterval(corruptionInterval);
+            corruptionInterval = setInterval(() => {
+                if (!isTypingActive && appState.page === 'story' && appState.segment === storySegments.length - 1) {
+                    const arr = originalText.split('');
+                    const i = Math.floor(Math.random() * arr.length);
+                    const glyph = ELDRITCH_GLYPHS[Math.floor(Math.random() * ELDRITCH_GLYPHS.length)];
+                    arr[i] = Math.random() < 0.7 ? glyph : String.fromCharCode(33 + Math.floor(Math.random() * 94));
+                    targetElement.textContent = arr.join('');
+                    setTimeout(() => {
+                        if (!isTypingActive && appState.page === 'story' && appState.segment === storySegments.length - 1) {
+                            targetElement.textContent = originalText;
+                        }
+                    }, 80);
+                }
+            }, 1000);
+        }
+
+        function stopCorruptionEffect() {
+            clearInterval(corruptionInterval);
+            corruptionInterval = null;
+        }
+
+        // Funzioni di rendering per le diverse "pagine"
+        function renderStoryDisplay() {
+            stopCorruptionEffect();
+            const segmentText = storySegments[appState.segment];
+            // La navHeight non è più usata per calcolare l'altezza del contenuto grazie a flex-grow
+            const navHeight = '180px'; // Usata solo per il padding-bottom della nav
+
+            mainPageContainer.innerHTML = `
+                <div class="flex flex-col h-full w-full max-w-3xl mx-auto">
+                    <div class="flex-grow overflow-auto p-6 bg-gray-800/90 rounded-lg shadow-xl">
+                        <p id="story-text-content" class="text-lg leading-relaxed text-justify whitespace-pre-wrap text-gray-200 font-ibm"></p>
+                        <div class="text-right text-gray-400 mt-4 text-sm italic">${appState.segment + 1}/${storySegments.length}</div>
+                    </div>
+                    <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex gap-2 justify-center"
+                        style="padding-bottom:env(safe-area-inset-bottom);">
+                        <button id="story-prev-btn" class="btn">← Indietro</button>
+                        <button id="story-next-btn" class="btn">${appState.segment === storySegments.length - 1 ? 'Esplora Universo' : 'Continua →'}</button>
+                        <button id="story-map-btn" class="btn bg-purple-600 hover:bg-purple-700">Mappa</button>
+                        <button id="story-reset-btn" class="btn bg-red-700 hover:bg-red-800">↺ Ricomincia</button>
+                    </nav>
+                </div>
+            `;
+
+            typeText(segmentText, 'story-text-content', () => {
+                if (appState.segment === storySegments.length - 1) {
+                    startCorruptionEffect(segmentText, 'story-text-content');
+                }
+                addSecret(`Secret-${Math.floor(Math.random() * 666)}`);
+            });
+
+            // Re-attacca gli event listener dopo che l'innerHTML è stato aggiornato
+            document.getElementById('story-next-btn').onclick = () => {
+                console.log('Next button clicked'); // Debug log
+                if (!isTypingActive) {
+                    if (appState.segment < storySegments.length - 1) {
+                        appState.segment++;
+                        renderPage();
+                    } else {
+                        appState.page = 'universeMap';
+                        renderPage();
+                    }
+                    saveState();
+                }
+            };
+            document.getElementById('story-prev-btn').onclick = () => {
+                console.log('Previous button clicked'); // Debug log
+                if (!isTypingActive && appState.segment > 0) {
+                    appState.segment--;
+                    renderPage();
+                    saveState();
+                }
+            };
+            document.getElementById('story-map-btn').onclick = () => {
+                console.log('Mappa button clicked from Story'); // Debug log
+                appState.page = 'universeMap';
+                renderPage();
+                saveState();
+            };
+            document.getElementById('story-reset-btn').onclick = () => {
+                console.log('Ricomincia button clicked from Story'); // Debug log
+                resetApplication();
+            };
+        }
+
+        function renderUniverseMapDisplay() {
+            stopCorruptionEffect();
+            // navHeight non è più usata per calcolare l'altezza del contenuto
+            const windowWidth = window.innerWidth;
+            const cols = windowWidth < 768 ? '1fr' : 'repeat(auto-fit,minmax(260px,1fr))';
+
+            let mapContentHtml = '';
+            for (const key in universeContent) {
+                const node = universeContent[key];
+                const visited = appState.visited.has(key);
+                const typeStyle = getTypeStyle(node.type);
+                const icon = getTypeIcon(node.type);
+
+                mapContentHtml += `
+                    <button data-node-key="${key}"
+                        class="p-4 flex flex-col items-center justify-center rounded-lg shadow-md transform hover:scale-105
+                        ${visited ? 'bg-green-800/90 border-green-500' : 'bg-gray-700/90 border-indigo-500'}"
+                        style="box-shadow: ${visited ? '0 0 15px rgba(0,255,204,0.5)' : '0 0 10px rgba(255,102,204,0.3)'};">
+                        <span class="font-semibold">${visited ? '📌 ' : ''}${node.title}</span>
+                        <span class="mt-1 px-2 py-1 rounded-full text-xs"
+                            style="background-color: ${typeStyle.bg}; color: ${typeStyle.color}; border: 1px solid ${typeStyle.border};">
+                            ${icon} ${node.type.toUpperCase()}
+                        </span>
+                    </button>
+                `;
+            }
+
+            mainPageContainer.innerHTML = `
+                <div class="flex flex-col h-full w-full max-w-3xl mx-auto">
+                    <h1 class="text-center text-3xl text-indigo-400 p-3">Mappa dell'Universo</h1>
+                    <div class="flex-grow overflow-auto bg-gray-800/90 p-4 rounded-lg shadow-xl">
+                        <div class="grid gap-4" style="grid-template-columns: ${cols}">
+                            ${mapContentHtml}
+                        </div>
+                    </div>
+                    <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex gap-2 justify-center"
+                        style="padding-bottom:env(safe-area-inset-bottom);">
+                        <button id="map-go-story-btn" class="btn bg-blue-600 hover:bg-blue-700">Torna alla Storia</button>
+                        <button id="map-reset-btn" class="btn bg-red-700 hover:bg-red-800">Ricomincia</button>
+                    </nav>
+                </div>
+            `;
+
+            // Re-attacca gli event listener dopo che l'innerHTML è stato aggiornato
+            document.querySelectorAll('#main-page-container button[data-node-key]').forEach(button => {
+                button.onclick = (event) => {
+                    console.log('Map node button clicked:', event.currentTarget.dataset.nodeKey); // Debug log
+                    const nodeKey = event.currentTarget.dataset.nodeKey;
+                    appState.page = nodeKey;
+                    appState.visited.add(nodeKey);
+                    appState.userSoul += 0.15;
+                    updateSoulDisplay();
+                    renderPage();
+                    saveState();
+                };
+            });
+
+            document.getElementById('map-go-story-btn').onclick = () => {
+                console.log('Torna alla Storia button clicked from Map'); // Debug log
+                appState.page = 'story';
+                renderPage();
+                saveState();
+            };
+            document.getElementById('map-reset-btn').onclick = () => {
+                console.log('Ricomincia button clicked from Map'); // Debug log
+                resetApplication();
+            };
+        }
+
+        function renderNodeDetailDisplay(nodeKey) {
+            stopCorruptionEffect();
+            const node = universeContent[nodeKey];
+            if (!node) {
+                appState.page = 'universeMap';
+                renderPage();
+                return;
+            }
+
+            // navHeight non è più usata per calcolare l'altezza del contenuto
+            const typeStyle = getTypeStyle(node.type);
+            const icon = getTypeIcon(node.type);
+
+            let textContentHtml = '';
+            if (Array.isArray(node.text)) {
+                textContentHtml = node.text.map(p => `<p class="mb-4 text-justify">${p}</p>`).join('');
+            } else {
+                textContentHtml = `<p class="mb-4 text-justify">${node.text}</p>`;
+            }
+
+            let codeBlockHtml = '';
+            if (node.codeBlockContent) {
+                codeBlockHtml = `
+                    <div class="p-4 bg-gray-900/80 rounded-md border border-purple-500 mb-6">
+                        <pre class="overflow-auto text-green-300 font-fira"><code>${node.codeBlockContent}</code></pre>
+                    </div>
+                `;
+            }
+
+            let connectionsHtml = '';
+            if (node.connections && node.connections.length > 0) {
+                let connectionButtonsHtml = '';
+                node.connections.forEach(id => {
+                    const connNode = universeContent[id];
+                    if (connNode) {
+                        const visited = appState.visited.has(id);
+                        connectionButtonsHtml += `
+                            <button data-node-key="${id}"
+                                class="px-3 py-1 rounded-full text-xs font-medium ${visited ? 'bg-green-600' : 'bg-blue-600'} text-white hover:brightness-110">
+                                ${visited ? '✅' : '🔗'} ${connNode.title}
+                            </button>
+                        `;
+                    }
+                });
+                connectionsHtml = `
+                    <div class="pt-4 border-t border-gray-600">
+                        <h3 class="text-xl text-blue-400 flex items-center mb-3">🔗 Nodi Collegati</h3>
+                        <div class="flex flex-wrap gap-2">
+                            ${connectionButtonsHtml}
+                        </div>
+                    </div>
+                `;
+            }
+
+            mainPageContainer.innerHTML = `
+                <div class="flex flex-col h-full w-full max-w-3xl mx-auto">
+                    <div class="flex-grow overflow-auto p-5 bg-gray-800/90 rounded-lg shadow-xl">
+                        <h1 class="text-3xl text-indigo-400 mb-3">${icon} ${node.title}</h1>
+                        ${textContentHtml}
+                        ${codeBlockHtml}
+                        ${connectionsHtml}
+                        <div class="mt-6 text-right">
+                            <span class="inline-block px-3 py-1 text-xs font-bold uppercase rounded-full"
+                                    style="background-color: ${typeStyle.bg}; color: ${typeStyle.color}; border: 1px solid ${typeStyle.border};">
+                                ${icon} ${node.type.toUpperCase()}
+                            </span>
+                        </div>
+                    </div>
+                    <nav class="flex-shrink-0 bg-gray-900/90 p-3 flex gap-2 justify-center"
+                        style="padding-bottom:env(safe-area-inset-bottom);">
+                        <button id="node-detail-go-map-btn" class="btn bg-blue-600 hover:bg-blue-700">Torna alla Mappa</button>
+                        <button id="node-detail-reset-btn" class="btn bg-red-700 hover:bg-red-800">Ricomincia</button>
+                    </nav>
+                </div>
+            `;
+
+            // Re-attacca gli event listener dopo che l'innerHTML è stato aggiornato
+            document.querySelectorAll('#main-page-container button[data-node-key]').forEach(button => {
+                button.onclick = (event) => {
+                    console.log('Node detail connection button clicked:', event.currentTarget.dataset.nodeKey); // Debug log
+                    const targetNodeKey = event.currentTarget.dataset.nodeKey;
+                    appState.page = targetNodeKey;
+                    appState.visited.add(targetNodeKey);
+                    appState.userSoul += 0.15;
+                    updateSoulDisplay();
+                    renderPage();
+                    saveState();
+                };
+            });
+
+            document.getElementById('node-detail-go-map-btn').onclick = () => {
+                console.log('Torna alla Mappa button clicked from Node Detail'); // Debug log
+                appState.page = 'universeMap';
+                renderPage();
+                saveState();
+            };
+            document.getElementById('node-detail-reset-btn').onclick = () => {
+                console.log('Ricomincia button clicked from Node Detail'); // Debug log
+                resetApplication();
+            };
+        }
+
+        // Funzione centrale per il rendering della pagina corrente
+        function renderPage() {
+            switch (appState.page) {
+                case 'story':
+                    renderStoryDisplay();
+                    break;
+                case 'universeMap':
+                    renderUniverseMapDisplay();
+                    break;
+                default:
+                    renderNodeDetailDisplay(appState.page);
+                    break;
+            }
+            updateHeader();
+            updateSoulDisplay();
+            updateSecretsDisplay();
+            saveState(); // Salva lo stato ad ogni cambio di pagina/render
+        }
+
+        // Funzioni per aggiornare gli elementi dell'interfaccia utente globali
+        function updateHeader() {
+            mainTitle.style.transform = `rotate(${appState.glyphRot * 0.2}deg)`;
+            mainTitle.style.filter = appState.corruption > 0 ? `hue-rotate(${appState.corruption * 30}deg) brightness(${1 - appState.corruption * 0.1})` : 'none';
+            mainTitle.style.textShadow = appState.corruption > 1 ? `0 0 8px #ff00ff,0 0 16px rgba(255,0,255,${0.5 + appState.corruption * 0.15})` : 'none';
+            mainGlyph.textContent = ELDRITCH_GLYPHS[appState.corruption % ELDRITCH_GLYPHS.length];
+            progressBar.style.width = `${(appState.segment / (storySegments.length - 1 || 1)) * 100}%`;
+        }
+
+        function updateSoulDisplay() {
+            soulValueDisplay.textContent = appState.userSoul.toFixed(2);
+        }
+
+        function addSecret(secret) {
+            appState.secrets.push(secret);
+            updateSecretsDisplay();
+        }
+
+        function updateSecretsDisplay() {
+            if (appState.userSoul > 0.5) {
+                secretsAside.classList.remove('hidden');
+                secretsAside.innerHTML = ''; // Pulisci i segreti precedenti
+                appState.secrets.forEach((s, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'animate-pulse';
+                    div.textContent = s;
+                    secretsAside.appendChild(div);
+                });
+            } else {
+                secretsAside.classList.add('hidden');
+            }
+        }
+
+        // Funzioni per gli effetti di sfondo e overlay
+        function updateDimensionalLayer() {
+            dimensionalLayer.style.background = `linear-gradient(${appState.dimPhase}deg, rgba(0,255,0,0.1), rgba(0,0,255,0.1))`;
+            dimensionalLayer.style.transform = `rotateX(${appState.dimPhase * 0.2}deg) rotateY(${appState.dimPhase * 0.1}deg)`;
+        }
+
+        function updateGlitchOverlay() {
+            glitchOverlay.style.setProperty('--int', appState.glitchInt);
+        }
+
+        // Loop di animazione (requestAnimationFrame)
+        let rafLoopId;
+        function animateLoop() {
+            appState.dimPhase = (appState.dimPhase + NEXUS_OSCILLATION_RATE) % 360;
+            appState.glyphRot = (appState.glyphRot + (Math.random() * 0.35 - 0.17)) % 360;
+            updateDimensionalLayer();
+            updateHeader(); // Aggiorna l'header per il glyphRot
+            rafLoopId = requestAnimationFrame(animateLoop);
+        }
+
+        // Intervalli per aggiornamenti periodici
+        let soulDecayInterval;
+        let glitchEffectInterval;
+
+        function startIntervals() {
+            soulDecayInterval = setInterval(() => {
+                appState.userSoul += SOUL_DECAY_RATE;
+                updateSoulDisplay();
+                if (Math.random() > 0.65) addSecret(`Glyph-${Math.floor(Math.random() * 999)}`);
+            }, 1000);
+
+            glitchEffectInterval = setInterval(() => {
+                if (Math.random() > 0.4) {
+                    appState.glitchInt = Math.random() * 0.9;
+                    updateGlitchOverlay();
+                    setTimeout(() => {
+                        appState.glitchInt = 0;
+                        updateGlitchOverlay();
+                    }, 250);
+                }
+            }, 1500);
+        }
+
+        function stopIntervals() {
+            clearInterval(soulDecayInterval);
+            clearInterval(glitchEffectInterval);
+        }
+
+        // Funzione di reset completa dell'applicazione
+        function resetApplication() {
+            stopIntervals();
+            cancelAnimationFrame(rafLoopId);
+            localStorage.removeItem('cosmicHorror');
+            appState = {
+                page: 'story',
+                segment: 0,
+                visited: new Set(),
+                userSoul: 0,
+                glyphRot: 0,
+                dimPhase: 0,
+                glitchInt: 0,
+                corruption: 0,
+                secrets: []
+            };
+            initApplication(); // Reinizializza l'applicazione
+        }
+
+        // Inizializzazione dell'applicazione
+        function initApplication() {
+            loadState();
+            // Assicurati che visited sia un Set anche se caricato da Array
+            if (Array.isArray(appState.visited)) {
+                appState.visited = new Set(appState.visited);
+            }
+            startIntervals();
+            animateLoop(); // Avvia il loop requestAnimationFrame
+            renderPage(); // Renderizza la pagina iniziale
+            // Imposta il livello di corruzione iniziale in base ai nodi visitati
+            const thresholds = [3, 6, 9];
+            appState.corruption = thresholds.findIndex(t => appState.visited.size >= t) + 1;
+            updateGlitchOverlay(); // Assicurati che l'overlay glitch sia aggiornato all'avvio
+        }
+
+        // Gestione eventi per il modal musicale
+        document.addEventListener('DOMContentLoaded', () => {
+            initApplication();
+
+            musicBtn.addEventListener('click', () => {
+                musicModalOverlay.classList.remove('hidden');
+            });
+
+            musicModalCloseBtn.addEventListener('click', () => {
+                musicModalOverlay.classList.add('hidden');
+            });
+
+            // Chiudi il modal cliccando fuori dal contenuto
+            musicModalOverlay.addEventListener('click', (event) => {
+                if (event.target === musicModalOverlay) {
+                    musicModalOverlay.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
