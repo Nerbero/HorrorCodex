@@ -234,6 +234,23 @@
         const TYPING_SPEED = 30; // Reso più veloce per un'esperienza più dinamica
         const ELDRITCH_GLYPHS = ["䷀","䷁","䷂","䷃","䷄","䷅","䷆","䷇","§","¶","†","‡","•","⁂","⁑","⸘","⸮","⸗","⸚","⸛","⸞","⸟","⸠","⸡","⸢","⸣","⸤","⸥","⸦","⸧","⸨","⸩","⸪","⸫","⸬","⸭","⸮","ⸯ","⸰","⸱","⸲","⸳","⸴","⸵","⸶","⸷","⸸","⸹","⸺","⸻","⸼","⸽","⸾","⸿"];
 
+        // Funzioni helper per lo stile e le icone (SPOSTATE QUI PER RISOLVERE ReferenceError)
+        function getTypeStyle(type) {
+            const styles = {
+                tech:        { bg: 'rgba(0,255,204,0.25)', color: '#00ffcc', border: '#00ffcc' },
+                character:   { bg: 'rgba(255,102,204,0.25)', color: '#ff66cc', border: '#ff66cc' },
+                lore:        { bg: 'rgba(170,102,255,0.25)', color: '#aa66ff', border: '#aa66ff' },
+                meta:        { bg: 'rgba(255,204,0,0.25)', color: '#ffcc00', border: '#ffcc00' },
+                'bio-digital': { bg: 'rgba(100,200,255,0.25)', color: '#64c8ff', border: '#64c8ff' }
+            };
+            return styles[type] ?? { bg: 'rgba(170,170,170,0.25)', color: '#aaaaaa', border: '#aaaaaa' };
+        }
+
+        function getTypeIcon(type) {
+            const icons = { tech: '🖥️', character: '👤', lore: '📜', meta: '🌀', 'bio-digital': '🧬' };
+            return icons[type] ?? '🔗';
+        }
+
         // Riferimenti agli elementi DOM
         const mainPageContainer = document.getElementById('main-page-container');
         const mainTitle = document.getElementById('main-title');
@@ -635,7 +652,7 @@ const debuggerLog = {
             // Re-attacca gli event listener dopo che l'innerHTML è stato aggiornato
             document.querySelectorAll('#main-page-container button[data-node-key]').forEach(button => {
                 button.onclick = (event) => {
-                    const nodeKey = event.currentTarget.dataset.nodeKey;
+                    const nodeKey = event.currentTarget.dataset.node-key;
                     appState.page = nodeKey;
                     appState.visited.add(nodeKey);
                     appState.userSoul += 0.15;
@@ -734,7 +751,7 @@ const debuggerLog = {
             // Re-attacca gli event listener dopo che l'innerHTML è stato aggiornato
             document.querySelectorAll('#main-page-container button[data-node-key]').forEach(button => {
                 button.onclick = (event) => {
-                    const targetNodeKey = event.currentTarget.dataset.nodeKey;
+                    const targetNodeKey = event.currentTarget.dataset.node-key;
                     appState.page = targetNodeKey;
                     appState.visited.add(targetNodeKey);
                     appState.userSoul += 0.15;
